@@ -6,11 +6,11 @@ import type { CreateLlmDto } from './schemas/create-llm.schema';
 
 @Controller('llm')
 export class LlmController {
-  constructor(private readonly llmservice: LlmService) {}
+  constructor(private readonly llmService: LlmService) {}
 
   @Post()
   @UsePipes(new ZodValidationPipe(createLlmSchema))
   async generate(@Body() llmDto: CreateLlmDto) {
-    return await this.llmservice.generate(llmDto);
+    return await this.llmService.generate(llmDto);
   }
 }
