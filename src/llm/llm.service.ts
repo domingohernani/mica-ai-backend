@@ -1,4 +1,4 @@
-import { CreateLlmDto } from './dto/create-llm.dto';
+import { CreateLlmDto } from './schemas/create-llm.schema';
 import { Injectable } from '@nestjs/common';
 
 @Injectable()
