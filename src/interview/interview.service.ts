@@ -17,7 +17,7 @@ export class InterviewService {
     if (!ObjectId.isValid(interviewDto.id)) {
       throw new Error('error!');
     }
-    
+
     const id = new ObjectId(interviewDto.id);
 
     return this.interview.findOne({ where: { _id: id } });
