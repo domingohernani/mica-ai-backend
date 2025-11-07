@@ -1,7 +1,11 @@
-import { InterviewDto } from './interview.dto';
-import { Injectable } from '@nestjs/common';
-import { GetInterviewParamDto } from './schemas/get-interview-param.schema';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { InterviewDto } from './interview.dto';
+import { GetInterviewParamDto } from './schemas/get-interview-param.schema';
 import { Interview } from './entities/interview.entity';
 import { Repository } from 'typeorm';
 import { ObjectId } from 'mongodb';
@@ -12,16 +16,21 @@ export class InterviewService {
     @InjectRepository(Interview) private interview: Repository<Interview>,
   ) {}
 
-  find(interviewDto: GetInterviewParamDto): Promise<InterviewDto | null> {
-    // Now it’s safe to construct
+  async find(interviewDto: GetInterviewParamDto): Promise<InterviewDto> {
+    // Checking if the id is a valid MongoDB id.
     if (!ObjectId.isValid(interviewDto.id)) {
-      throw new Error('error!');
+      throw new BadRequestException('Invalid interview ID format.');
     }
 
     const id = new ObjectId(interviewDto.id);
-
-    return this.interview.findOne({ where: { _id: id } });
-    // return this.INTERVIEW.find((interview) => interview.id === interviewDto.id);
+    const interview = await this.interview.findOne({ where: { _id: id } });
+    // Checking if the interview is found.
+    if (!interview) {
+      throw new NotFoundException(
+        `Interview with ID ${id.toString()} not found`,
+      );
+    }
+    return interview;
   }
 
   create(interviewDto: InterviewDto): Promise<InterviewDto> {
@@ -29,19 +38,3 @@ export class InterviewService {
     return this.interview.save(newInterview);
   }
 }
-
-//   conversation: [
-//     {
-//       originalQuestion: '',
-//         aiQuestion: {
-//           text: '',
-//           audioUrl: '',
-//         },
-//         intervieweeAnswer: {
-//           text: '',
-//           videoUrl: '',
-//           audioUrl: '',
-//         },
-//       isDone: false,
-//     },
-//   ],

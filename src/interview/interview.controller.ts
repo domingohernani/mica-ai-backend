@@ -12,11 +12,12 @@ export class InterviewController {
 
   @Get(':id')
   @UsePipes(new ZodValidationPipe(getInterviewParamSchema))
-  findAll(
+  async find(
     @Param() interviewDto: GetInterviewParamDto,
-  ): Promise<InterviewDto | null> {
-    return this.interviewSerivce.find(interviewDto);
+  ): Promise<InterviewDto> {
+    return await this.interviewSerivce.find(interviewDto);
   }
+
   @Post()
   @UsePipes(new ZodValidationPipe(createInterviewSchema))
   async create(@Body() interviewDto: InterviewDto): Promise<InterviewDto> {

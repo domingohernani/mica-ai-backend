@@ -1,6 +1,21 @@
+// import z from 'zod';
+
 import z from 'zod';
 
 export const createInterviewSchema = z.object({
-  id: z.number().optional(),
-  answer: z.string(),
+  conversation: z.array(
+    z.object({
+      id: z
+        .string()
+        .regex(/^[0-9a-fA-F]{24}$/, 'Invalid ObjectId')
+        .optional(),
+      originalQuestion: z.string(),
+      aiQuestion: z.string().nullable().default(null),
+      answer: z.string().nullable().default(null),
+      isAnswered: z.boolean().default(false),
+    }),
+  ),
+  isDone: z.boolean().default(false),
 });
+
+export type InterviewDto = z.infer<typeof createInterviewSchema>;

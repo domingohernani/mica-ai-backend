@@ -1,8 +1,6 @@
 export class InterviewDto {
-  readonly id?: number;
-  // conversation: {
-  //   id: number;
-  //   originalQuestion: string;
-  // }[];
-  readonly answer: string;
+  readonly conversation: {
+    originalQuestion: string;
+  }[];
+  readonly isDone: boolean;
 }
