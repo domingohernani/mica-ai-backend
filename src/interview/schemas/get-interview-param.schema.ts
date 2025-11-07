@@ -1,7 +1,7 @@
 import z from 'zod';
 
 export const getInterviewParamSchema = z.object({
-  id: z.string(),
+  _id: z.string(),
 });
 
 export type GetInterviewParamDto = z.infer<typeof getInterviewParamSchema>;

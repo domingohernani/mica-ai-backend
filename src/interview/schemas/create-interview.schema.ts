@@ -3,7 +3,7 @@ import z from 'zod';
 export const createInterviewSchema = z.object({
   conversation: z.array(
     z.object({
-      id: z
+      _id: z
         .string()
         .regex(/^[0-9a-fA-F]{24}$/, 'Invalid ObjectId')
         .optional(),

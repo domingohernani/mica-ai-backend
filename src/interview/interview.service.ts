@@ -19,11 +19,11 @@ export class InterviewService {
 
   async find(interviewDto: GetInterviewParamDto): Promise<InterviewDto> {
     // Checking if the id is a valid MongoDB id.
-    if (!ObjectId.isValid(interviewDto.id)) {
+    if (!ObjectId.isValid(interviewDto._id)) {
       throw new BadRequestException('Invalid interview ID format.');
     }
 
-    const id = new ObjectId(interviewDto.id);
+    const id = new ObjectId(interviewDto._id);
     const interview = await this.interview.findOne({ where: { _id: id } });
     // Checking if the interview is found.
     if (!interview) {

@@ -9,19 +9,19 @@ import { getInterviewParamSchema } from './schemas/get-interview-param.schema';
 
 @Controller('interview')
 export class InterviewController {
-  constructor(private readonly interviewSerivce: InterviewService) {}
+  constructor(private readonly interviewService: InterviewService) {}
 
-  @Get(':id')
+  @Get(':_id')
   @UsePipes(new ZodValidationPipe(getInterviewParamSchema))
   async find(
     @Param() interviewDto: GetInterviewParamDto,
   ): Promise<InterviewDto> {
-    return await this.interviewSerivce.find(interviewDto);
+    return await this.interviewService.find(interviewDto);
   }
 
   @Post()
   @UsePipes(new ZodValidationPipe(createInterviewSchema))
   async create(@Body() interviewDto: InterviewDto): Promise<InterviewDto> {
-    return await this.interviewSerivce.create(interviewDto);
+    return await this.interviewService.create(interviewDto);
   }
 }
