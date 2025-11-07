@@ -1,5 +1,3 @@
-// import z from 'zod';
-
 import z from 'zod';
 
 export const createInterviewSchema = z.object({
@@ -17,5 +15,3 @@ export const createInterviewSchema = z.object({
   ),
   isDone: z.boolean().default(false),
 });
-
-export type InterviewDto = z.infer<typeof createInterviewSchema>;
