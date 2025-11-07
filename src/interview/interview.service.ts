@@ -4,11 +4,12 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { ObjectId } from 'mongodb';
+import { Repository } from 'typeorm';
+
+import { Interview } from './entities/interview.entity';
 import { InterviewDto } from './interview.dto';
 import { GetInterviewParamDto } from './schemas/get-interview-param.schema';
-import { Interview } from './entities/interview.entity';
-import { Repository } from 'typeorm';
-import { ObjectId } from 'mongodb';
 
 @Injectable()
 export class InterviewService {

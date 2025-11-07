@@ -1,5 +1,6 @@
-import { CreateLlmDto } from './schemas/create-llm.schema';
 import { Injectable } from '@nestjs/common';
+
+import { CreateLlmDto } from './schemas/create-llm.schema';
 
 @Injectable()
 export class LlmService {

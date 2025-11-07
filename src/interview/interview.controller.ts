@@ -1,10 +1,11 @@
 import { Body, Controller, Get, Param, Post, UsePipes } from '@nestjs/common';
-import { InterviewService } from './interview.service';
 import { ZodValidationPipe } from 'src/common/pipes/zod-validation.pipe';
-import { getInterviewParamSchema } from './schemas/get-interview-param.schema';
-import type { GetInterviewParamDto } from './schemas/get-interview-param.schema';
+
 import { InterviewDto } from './interview.dto';
+import { InterviewService } from './interview.service';
 import { createInterviewSchema } from './schemas/create-interview.schema';
+import type { GetInterviewParamDto } from './schemas/get-interview-param.schema';
+import { getInterviewParamSchema } from './schemas/get-interview-param.schema';
 
 @Controller('interview')
 export class InterviewController {

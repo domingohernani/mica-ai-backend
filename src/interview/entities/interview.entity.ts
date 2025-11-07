@@ -1,11 +1,11 @@
-import {
-  Entity,
-  ObjectIdColumn,
-  Column,
-  ObjectId,
-  BeforeInsert,
-} from 'typeorm';
 import { ObjectId as MongoObjectId } from 'mongodb';
+import {
+  BeforeInsert,
+  Column,
+  Entity,
+  ObjectId,
+  ObjectIdColumn,
+} from 'typeorm';
 @Entity()
 export class Interview {
   @ObjectIdColumn()

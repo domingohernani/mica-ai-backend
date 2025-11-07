@@ -1,8 +1,9 @@
-import { LlmService } from './llm.service';
 import { Body, Controller, Post, UsePipes } from '@nestjs/common';
+
 import { ZodValidationPipe } from '../common/pipes/zod-validation.pipe';
-import { createLlmSchema } from './schemas/create-llm.schema';
+import { LlmService } from './llm.service';
 import type { CreateLlmDto } from './schemas/create-llm.schema';
+import { createLlmSchema } from './schemas/create-llm.schema';
 
 @Controller('llm')
 export class LlmController {
