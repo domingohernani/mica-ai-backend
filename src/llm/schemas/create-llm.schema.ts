@@ -1,6 +1,10 @@
-import z from 'zod';
+import z, { ZodType } from 'zod';
 
-export const createLlmSchema = z.object({
+export const createLlmSchema: ZodType<{
+  model: string;
+  prompt: string;
+  stream: boolean;
+}> = z.object({
   model: z.string(),
   prompt: z.string(),
   stream: z.boolean(),
