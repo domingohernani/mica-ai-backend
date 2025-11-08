@@ -1,6 +1,16 @@
 import z from 'zod';
+import { ZodType } from 'zod';
 
-export const createInterviewSchema = z.object({
+export const createInterviewSchema: ZodType<{
+  conversation: {
+    _id?: string;
+    originalQuestion: string;
+    aiQuestion: string | null;
+    answer: string | null;
+    isAnswered: boolean;
+  }[];
+  isDone: boolean;
+}> = z.object({
   conversation: z.array(
     z.object({
       _id: z

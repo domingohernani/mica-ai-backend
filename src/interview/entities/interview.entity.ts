@@ -6,6 +6,9 @@ import {
   ObjectId,
   ObjectIdColumn,
 } from 'typeorm';
+
+import { QuestionDto } from '../question/question.dto';
+
 @Entity()
 export class Interview {
   @ObjectIdColumn()
@@ -24,9 +27,9 @@ export class Interview {
   isDone: boolean;
 
   @BeforeInsert()
-  generateConversation() {
+  generateConversation(): void {
     if (this.conversation) {
-      this.conversation = this.conversation.map((convo) => ({
+      this.conversation = this.conversation.map((convo: QuestionDto) => ({
         ...convo,
         _id: convo._id || new MongoObjectId(),
       }));
