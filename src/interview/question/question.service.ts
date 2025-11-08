@@ -7,17 +7,19 @@ import { QuestionDto } from './question.dto';
 
 @Injectable()
 export class QuestionService {
+  // Inject the Interview repository to perform database operations
   constructor(private interview: InterviewService) {}
 
-  // Get current unanswered question.
+  // Find current unanswered question.
   async find(interviewDto: GetParamDto): Promise<QuestionDto | null> {
     // Use the find method of interview service.
     const interview: InterviewDto = await this.interview.find(interviewDto);
 
     // Get the current unanswered question. If undefined, it returns null, meaning
     // all questions are answered, so proceed to calculation.
-    const currentQuestion =
-      interview.conversation.find((convo) => !convo.isAnswered) ?? null;
+    const currentQuestion: QuestionDto | null =
+      interview.conversation.find((convo: QuestionDto) => !convo.isAnswered) ??
+      null;
     return currentQuestion;
   }
 }

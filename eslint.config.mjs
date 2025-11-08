@@ -28,12 +28,29 @@ export default tseslint.config(
       'simple-import-sort': simpleImportSort,
     },
     rules: {
-      '@typescript-eslint/no-explicit-any': 'off',
+      // Force explicit types
+      '@typescript-eslint/explicit-function-return-type': 'error',
+      '@typescript-eslint/typedef': [
+        'error',
+        {
+          arrayDestructuring: true,
+          arrowParameter: true,
+          memberVariableDeclaration: true,
+          objectDestructuring: true,
+          parameter: true,
+          propertyDeclaration: true,
+          variableDeclaration: true,
+          variableDeclarationIgnoreFunction: false,
+        },
+      ],
+
+      // Enforce other best practices
       '@typescript-eslint/no-floating-promises': 'warn',
       '@typescript-eslint/no-unsafe-argument': 'warn',
+      '@typescript-eslint/no-explicit-any': 'error',
       'prettier/prettier': ['error', { endOfLine: 'auto' }],
-      'simple-import-sort/imports': 'error',
-      'simple-import-sort/exports': 'error',
+      'simple-import-sort/imports': 'warn',
+      'simple-import-sort/exports': 'warn',
     },
   },
 );
