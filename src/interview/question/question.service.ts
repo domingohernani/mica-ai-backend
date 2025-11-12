@@ -1,4 +1,6 @@
 import { Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 
 import { LlmService } from '../../llm/llm.service';
 import {
@@ -8,6 +10,7 @@ import {
 import { InterviewDto } from '../interview.dto';
 import { GetParamDto } from './../../common/schemas/get-param.schema';
 import { CreateLlmDto } from './../../llm/schemas/create-llm.schema';
+import { Interview } from './../entities/interview.entity';
 import { InterviewService } from './../interview.service';
 import { QuestionDto } from './question.dto';
 import type { GetQuestionDto } from './schemas/get-question.schema';
@@ -16,6 +19,8 @@ import type { GetQuestionDto } from './schemas/get-question.schema';
 export class QuestionService {
   // Inject the Interview repository to perform database operations
   constructor(
+    // We directly use the interview repo becauuse this service is still part of the interview schema.
+    @InjectRepository(Interview) private interviewRepo: Repository<Interview>,
     private interview: InterviewService,
     private llm: LlmService,
   ) {}
@@ -62,15 +67,34 @@ export class QuestionService {
         aiQuestion: generatedQuestion,
         _id: currentQuestion._id.toString(),
       };
+
+      const newQuestion: QuestionDto = {
+        _id: currentQuestion._id,
+        originalQuestion: currentQuestion.originalQuestion,
+        aiQuestion: generatedQuestion,
+        answer: '',
+        isAnswered: false,
+      };
+
+      console.log('Before: ', newQuestion);
+
+      await this.update(
+        interviewDto,
+        { _id: currentQuestion._id.toString() },
+        newQuestion,
+      );
     } else {
       // Generate custom injected prompt.
-      const originalQuestion: string = currentQuestion.originalQuestion;
-      const answer: string = currentQuestion.answer;
-      const nextQuestion: QuestionDto = conversation[currentQuestionIndex + 1];
+      // Get the previous interaction to for the LLM to analyze.
+      const previousConvo: QuestionDto = conversation[currentQuestionIndex - 1];
+      const previousQuestion: string = previousConvo.aiQuestion;
+      const previousAnswer: string = previousConvo.answer;
+      const nextQuestion: string = currentQuestion.originalQuestion;
+
       const prompt: string = generateQuestion(
-        originalQuestion,
-        answer,
-        nextQuestion.originalQuestion,
+        previousQuestion,
+        previousAnswer,
+        nextQuestion,
       );
       llmDto.prompt = prompt;
 
@@ -84,5 +108,36 @@ export class QuestionService {
     }
 
     return newCurrentQuestion;
+  }
+
+  // Update interview question
+  async update(
+    interviewId: GetParamDto,
+    questionId: GetParamDto,
+    question: QuestionDto,
+  ): Promise<QuestionDto[]> {
+    // Use the find method of interview service.
+    const interview: InterviewDto = await this.interview.find(interviewId);
+    const conversation: QuestionDto[] = interview.conversation;
+    // let selectedQuestion: QuestionDto | null =
+    //   conversation.find(
+    //     (convo: QuestionDto) =>
+    //       convo._id.toString() == questionId._id.toString(),
+    //   ) ?? null;
+
+    const updatedConversation: QuestionDto[] = conversation.map(
+      (_question: QuestionDto) => {
+        if (_question._id.toString() == questionId._id.toString()) {
+          return question;
+        }
+        return _question;
+      },
+    );
+
+    await this.interviewRepo.update(interviewId._id, {
+      conversation: updatedConversation,
+    });
+
+    return updatedConversation;
   }
 }

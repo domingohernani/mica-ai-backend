@@ -19,8 +19,6 @@ export class LlmService {
       body: JSON.stringify(llmDto),
     });
 
-    console.log(llmDto);
-
     const result: LlmResponse = (await response.json()) as LlmResponse;
     // Remove \n characters. It might confuse the TTS.
     return result.response.replace(/\n+/g, ' ');
