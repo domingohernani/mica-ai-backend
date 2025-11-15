@@ -1,17 +1,15 @@
-import { Injectable } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { ObjectId } from 'mongodb';
-import { Repository } from 'typeorm';
 
 import { LlmService } from '../../llm/llm.service';
 import {
   generateFirstQuestion,
+  generateLastResponse,
   generateQuestion,
 } from '../../utils/generate-prompt';
 import { InterviewDto } from '../interview.dto';
 import { GetParamDto } from './../../common/schemas/get-param.schema';
 import { CreateLlmDto } from './../../llm/schemas/create-llm.schema';
-import { Interview } from './../entities/interview.entity';
 import { InterviewService } from './../interview.service';
 import { QuestionDto } from './question.dto';
 import type { GetQuestionDto } from './schemas/get-question.schema';
@@ -20,14 +18,14 @@ import type { GetQuestionDto } from './schemas/get-question.schema';
 export class QuestionService {
   // Inject the Interview repository to perform database operations
   constructor(
-    // We directly use the interview repo becauuse this service is still part of the interview schema.
-    @InjectRepository(Interview) private interviewRepo: Repository<Interview>,
     private interview: InterviewService,
     private llm: LlmService,
   ) {}
 
   // Find current unanswered question.
-  async find(interviewDto: GetParamDto): Promise<GetQuestionDto | null> {
+  async find(
+    interviewDto: GetParamDto,
+  ): Promise<GetQuestionDto | InterviewDto> {
     // Use the find method of interview service.
     const interview: InterviewDto = await this.interview.find(interviewDto);
     const conversation: QuestionDto[] = interview.conversation;
@@ -36,7 +34,57 @@ export class QuestionService {
     // all questions are answered, so proceed to calculation.
     const currentQuestion: QuestionDto | null =
       conversation.find((convo: QuestionDto) => !convo.isAnswered) ?? null;
-    if (!currentQuestion) return null;
+
+    // Check if all questions are already answered.
+    const isAllAnswered: boolean = conversation.every(
+      (convo: QuestionDto) => convo.isAnswered,
+    );
+
+    // Actual generated AI prompt
+    const llmDto: CreateLlmDto = {
+      model: 'gemma3:4b',
+      prompt: '',
+      stream: false,
+    };
+
+    // Case where all questions are alread answered.
+    if (isAllAnswered) {
+      // Eearly return do not recompute
+      if (interview.finalMessage) return interview;
+
+      // Generate custom injected prompt.
+      const previousConvo: QuestionDto = conversation[conversation.length - 1];
+      const previousQuestion: string = previousConvo.originalQuestion;
+      const previousAnswer: string = previousConvo.answer;
+      const prompt: string = generateLastResponse(
+        previousQuestion,
+        previousAnswer,
+      );
+      llmDto.prompt = prompt;
+      // Call LLM to generate question to end the interview
+      const generatedQuestion: string = await this.llm.generate(llmDto);
+
+      // Update isDone and finalMessage field.
+      const newInterview: InterviewDto = await this.interview.update<
+        InterviewDto,
+        '_id'
+      >(
+        interviewDto,
+        { _id: new ObjectId(interviewDto._id) },
+        {
+          isDone: true,
+          finalMessage: generatedQuestion,
+        },
+      );
+
+      return newInterview;
+    }
+
+    if (!currentQuestion) {
+      throw new NotFoundException(
+        `No questions remaining for interview with ID ${interviewDto._id}.`,
+      );
+    }
 
     // Check if there's already AI generated response/question.
     if (currentQuestion.aiQuestion)
@@ -47,13 +95,6 @@ export class QuestionService {
       (convo: QuestionDto) =>
         convo._id.toString() === currentQuestion._id.toString(),
     );
-
-    // Actual generated AI prompt
-    const llmDto: CreateLlmDto = {
-      model: 'gemma3:4b',
-      prompt: '',
-      stream: false,
-    };
 
     // Check if the current question is the first question.
     // Injected prompt is a bit different on first, middle, and last question.
@@ -67,7 +108,7 @@ export class QuestionService {
       // Generate custom injected prompt.
       // Get the previous interaction to for the LLM to analyze.
       const previousConvo: QuestionDto = conversation[currentQuestionIndex - 1];
-      const previousQuestion: string = previousConvo.aiQuestion;
+      const previousQuestion: string = previousConvo.originalQuestion;
       const previousAnswer: string = previousConvo.answer;
       const nextQuestion: string = currentQuestion.originalQuestion;
 
@@ -89,7 +130,6 @@ export class QuestionService {
       answer: '',
       isAnswered: false,
     };
-
     // Update current conversation/question
     await this.update(
       interviewDto,

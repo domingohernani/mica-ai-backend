@@ -1,5 +1,6 @@
 import type { GenerateFirstQuestion } from '../common/types/prompt.types';
 import type { GenerateQuestion } from '../common/types/prompt.types';
+import type { GenerateLastResponse } from '../common/types/prompt.types';
 
 export const generateFirstQuestion: GenerateFirstQuestion = (
   question: string,
@@ -16,6 +17,27 @@ export const generateFirstQuestion: GenerateFirstQuestion = (
         Speak as Mica:
         First Question: ${question}
         `;
+
+  return systemPrompt;
+};
+
+export const generateLastResponse: GenerateLastResponse = (
+  previousQuestion: string,
+  previousAnswer: string,
+): string => {
+  const systemPrompt: string = `
+      You are Mica, an AI interviewer continuing a professional job interview. Speak as Mica, but do not mention your name or refer to yourself directly
+
+      1. Read the applicant's previous answer carefully.
+      2. Provide a short, friendly acknowledgment that shows you understood their response.
+      3. Wrap up the interview smoothly, like a professional recruiter.
+      4. Politely thank the applicant for their time and effort.
+      5. Mention that the recruitment team will review the interview and reach out with next steps.
+      6. Keep the tone professional, polite, and conversational. Do not introduce new questions or topics.
+
+      Previous Question: ${previousQuestion}
+      Candidate's Previous Answer: ${previousAnswer}
+  `;
 
   return systemPrompt;
 };
