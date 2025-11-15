@@ -10,4 +10,5 @@ export class InterviewDto {
     isAnswered: boolean;
   }[];
   readonly isDone: boolean;
+  readonly finalMessage: string;
 }

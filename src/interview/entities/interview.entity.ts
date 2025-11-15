@@ -26,6 +26,9 @@ export class Interview {
   @Column({ default: false })
   isDone: boolean;
 
+  @Column({ default: '' })
+  finalMessage: string;
+
   @BeforeInsert()
   generateConversation(): void {
     if (this.conversation) {
