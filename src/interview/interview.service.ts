@@ -31,9 +31,21 @@ export class InterviewService {
   }
 
   // Create an interview document
-  create(interviewDto: InterviewDto): Promise<InterviewDto> {
+  async create(interviewDto: InterviewDto): Promise<InterviewDto> {
     const newInterview: InterviewDto = this.interview.create(interviewDto);
     // Saves into the database
-    return this.interview.save(newInterview);
+    return await this.interview.save(newInterview);
+  }
+
+  // Update an inteview document dynamically
+  async update<Type, Key extends keyof Type>(
+    interviewDto: GetParamDto,
+    filter: Record<Key, Type[Key]>,
+    updatedValue: Partial<Type>,
+  ): Promise<InterviewDto> {
+    await this.interview.update(filter, updatedValue);
+    // Find the interview using the  dto
+    const updatedInterview: InterviewDto = await this.find(interviewDto);
+    return updatedInterview;
   }
 }
