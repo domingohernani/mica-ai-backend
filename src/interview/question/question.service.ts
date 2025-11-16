@@ -1,5 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { ObjectId } from 'mongodb';
+import { TtsService } from 'src/tts/tts.service';
 
 import { LlmService } from '../../llm/llm.service';
 import {
@@ -20,6 +21,7 @@ export class QuestionService {
   constructor(
     private interview: InterviewService,
     private llm: LlmService,
+    private tts: TtsService,
   ) {}
 
   // Find current unanswered question.
@@ -47,6 +49,8 @@ export class QuestionService {
       stream: false,
     };
 
+    await this.tts.synthesize();
+
     // Case where all questions are alread answered.
     if (isAllAnswered) {
       // Eearly return do not recompute
@@ -63,6 +67,7 @@ export class QuestionService {
       llmDto.prompt = prompt;
       // Call LLM to generate question to end the interview
       const generatedQuestion: string = await this.llm.generate(llmDto);
+      await this.tts.synthesize();
 
       // Update isDone and finalMessage field.
       const newInterview: InterviewDto = await this.interview.update<

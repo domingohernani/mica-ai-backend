@@ -6,17 +6,19 @@ import { AppService } from './app.service';
 import { Interview } from './interview/entities/interview.entity';
 import { InterviewModule } from './interview/interview.module';
 import { LlmModule } from './llm/llm.module';
+import { TtsModule } from './tts/tts.module';
 
 @Module({
   imports: [
     TypeOrmModule.forRoot({
       type: 'mongodb',
       url: process.env.MONGODB_URI,
-      synchronize: true, // FIXME: remove in production
+      synchronize: true, // TODO: remove in production
       entities: [Interview],
     }),
     LlmModule,
     InterviewModule,
+    TtsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
