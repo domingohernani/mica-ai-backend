@@ -3,6 +3,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { LlmModule } from 'src/llm/llm.module';
 import { TtsModule } from 'src/tts/tts.module';
 
+import { StorageModule } from '../../storage/storage.module';
 import { Interview } from '../entities/interview.entity';
 import { InterviewModule } from '../interview.module';
 import { QuestionController } from './question.controller';
@@ -16,6 +17,7 @@ import { QuestionService } from './question.service';
     forwardRef(() => InterviewModule),
     LlmModule,
     TtsModule,
+    StorageModule,
   ],
 })
 export class QuestionModule {}

@@ -6,6 +6,7 @@ import { AppService } from './app.service';
 import { Interview } from './interview/entities/interview.entity';
 import { InterviewModule } from './interview/interview.module';
 import { LlmModule } from './llm/llm.module';
+import { StorageModule } from './storage/storage.module';
 import { TtsModule } from './tts/tts.module';
 
 @Module({
@@ -19,6 +20,7 @@ import { TtsModule } from './tts/tts.module';
     LlmModule,
     InterviewModule,
     TtsModule,
+    StorageModule,
   ],
   controllers: [AppController],
   providers: [AppService],

@@ -1,7 +1,9 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { ObjectId } from 'mongodb';
+import { StorageService } from 'src/storage/storage.service';
 import { TtsService } from 'src/tts/tts.service';
 
+import { SynthesizeResponse } from '../../common/types/tts.types';
 import { LlmService } from '../../llm/llm.service';
 import {
   generateFirstQuestion,
@@ -22,6 +24,7 @@ export class QuestionService {
     private interview: InterviewService,
     private llm: LlmService,
     private tts: TtsService,
+    private storage: StorageService,
   ) {}
 
   // Find current unanswered question.
@@ -49,8 +52,6 @@ export class QuestionService {
       stream: false,
     };
 
-    await this.tts.synthesize();
-
     // Case where all questions are alread answered.
     if (isAllAnswered) {
       // Eearly return do not recompute
@@ -67,7 +68,13 @@ export class QuestionService {
       llmDto.prompt = prompt;
       // Call LLM to generate question to end the interview
       const generatedQuestion: string = await this.llm.generate(llmDto);
-      await this.tts.synthesize();
+      // Get a buffer file and save to Google Cloud.
+      const bufferFile: SynthesizeResponse =
+        await this.tts.synthesize(generatedQuestion);
+      await this.storage.upload(
+        bufferFile.audioContent as Buffer,
+        `${interviewDto._id.toString()}/${interviewDto._id.toString()}.mp3`,
+      );
 
       // Update isDone and finalMessage field.
       const newInterview: InterviewDto = await this.interview.update<
@@ -127,6 +134,13 @@ export class QuestionService {
 
     // Call LLM to generate question.
     const generatedQuestion: string = await this.llm.generate(llmDto);
+    // Get a buffer file and save to Google Cloud.
+    const bufferFile: SynthesizeResponse =
+      await this.tts.synthesize(generatedQuestion);
+    await this.storage.upload(
+      bufferFile.audioContent as Buffer,
+      `${interviewDto._id.toString()}/${currentQuestion._id.toString()}.mp3`,
+    );
 
     const newQuestion: QuestionDto = {
       _id: currentQuestion._id,
@@ -142,7 +156,6 @@ export class QuestionService {
       newQuestion,
     );
 
-    // TODO: include mp3 url that is stored in GCP Text-to-Speech
     // Attach the generated question to the current question
     const newCurrentQuestion: GetQuestionDto = {
       aiQuestion: generatedQuestion,
