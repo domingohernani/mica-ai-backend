@@ -1,6 +1,7 @@
 import { forwardRef, Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
+import { StorageModule } from './../storage/storage.module';
 import { Interview } from './entities/interview.entity';
 import { InterviewController } from './interview.controller';
 import { InterviewService } from './interview.service';
@@ -13,6 +14,7 @@ import { QuestionModule } from './question/question.module';
   imports: [
     TypeOrmModule.forFeature([Interview]),
     forwardRef(() => QuestionModule),
+    StorageModule,
   ],
 })
 export class InterviewModule {}
