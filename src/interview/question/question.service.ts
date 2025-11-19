@@ -68,13 +68,15 @@ export class QuestionService {
       llmDto.prompt = prompt;
       // Call LLM to generate question to end the interview
       const generatedQuestion: string = await this.llm.generate(llmDto);
+
+      // Get the Text-to-Speech signed url
+      const path: string = `${interviewDto._id.toString()}/${interviewDto._id.toString()}.mp3`;
+      const signedUrl: string = await this.storage.sign(path);
+
       // Get a buffer file and save to Google Cloud.
       const bufferFile: SynthesizeResponse =
         await this.tts.synthesize(generatedQuestion);
-      await this.storage.upload(
-        bufferFile.audioContent as Buffer,
-        `${interviewDto._id.toString()}/${interviewDto._id.toString()}.mp3`,
-      );
+      await this.storage.upload(bufferFile.audioContent as Buffer, path);
 
       // Update isDone and finalMessage field.
       const newInterview: InterviewDto = await this.interview.update<
@@ -86,6 +88,7 @@ export class QuestionService {
         {
           isDone: true,
           finalMessage: generatedQuestion,
+          finalTtsSignedUrl: signedUrl,
         },
       );
 
@@ -98,9 +101,17 @@ export class QuestionService {
       );
     }
 
+    // Get the Text-to-Speech signed url
+    const path: string = `${interviewDto._id.toString()}/${currentQuestion._id.toString()}.mp3`;
+    const signedUrl: string = await this.storage.sign(path);
+
     // Check if there's already AI generated response/question.
     if (currentQuestion.aiQuestion)
-      return { ...currentQuestion, _id: currentQuestion._id.toString() };
+      return {
+        ...currentQuestion,
+        aiTtsSignedUrl: signedUrl,
+        _id: currentQuestion._id.toString(),
+      };
 
     // Get the index of the current question.
     const currentQuestionIndex: number = conversation.findIndex(
@@ -159,6 +170,7 @@ export class QuestionService {
     // Attach the generated question to the current question
     const newCurrentQuestion: GetQuestionDto = {
       aiQuestion: generatedQuestion,
+      aiTtsSignedUrl: signedUrl,
       _id: currentQuestion._id.toString(),
     };
     return newCurrentQuestion;

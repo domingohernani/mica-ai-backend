@@ -1,6 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ObjectId } from 'mongodb';
+import { StorageService } from 'src/storage/storage.service';
 import { Repository } from 'typeorm';
 
 import { GetParamDto } from '../common/schemas/get-param.schema';
@@ -12,14 +13,30 @@ export class InterviewService {
   // Inject the Interview repository to perform database operations
   constructor(
     @InjectRepository(Interview) private interview: Repository<Interview>,
+    private storage: StorageService,
   ) {}
 
   // Find the right interview using interview ID
   async find(interviewDto: GetParamDto): Promise<InterviewDto> {
     const id: ObjectId = new ObjectId(interviewDto._id);
-    const interview: InterviewDto | null = await this.interview.findOne({
+    const interview: Interview | null = await this.interview.findOne({
       where: { _id: id },
     });
+
+    if (!interview) {
+      throw new NotFoundException(
+        `Interview with ID ${id.toString()} not found`,
+      );
+    }
+
+    // Get the Text-to-Speech signed url
+    const path: string = `${interviewDto._id.toString()}/${interviewDto._id.toString()}.mp3`;
+    const signedUrl: string = await this.storage.sign(path);
+
+    const convertedInterview: InterviewDto = {
+      ...interview,
+      finalTtsSignedUrl: signedUrl,
+    };
 
     // Checking if the interview is found. Throws an error if not found
     if (!interview) {
@@ -27,12 +44,12 @@ export class InterviewService {
         `Interview with ID ${id.toString()} not found`,
       );
     }
-    return interview;
+    return convertedInterview;
   }
 
   // Create an interview document
-  async create(interviewDto: InterviewDto): Promise<InterviewDto> {
-    const newInterview: InterviewDto = this.interview.create(interviewDto);
+  async create(interviewDto: InterviewDto): Promise<Interview> {
+    const newInterview: Interview = this.interview.create(interviewDto);
     // Saves into the database
     return await this.interview.save(newInterview);
   }
