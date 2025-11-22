@@ -4,10 +4,10 @@ import { Injectable } from '@nestjs/common';
 import {
   SynthesizeRequest,
   SynthesizeResponse,
-} from './../common/types/tts.types';
+} from '../common/types/tts.types';
 
 @Injectable()
-export class TtsService {
+export class SpeechService {
   private client: TextToSpeechClient;
 
   constructor() {

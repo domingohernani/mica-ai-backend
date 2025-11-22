@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { ObjectId } from 'mongodb';
+import { SpeechService } from 'src/speech/speech.service';
 import { StorageService } from 'src/storage/storage.service';
-import { TtsService } from 'src/tts/tts.service';
 
 import { SynthesizeResponse } from '../../common/types/tts.types';
 import { LlmService } from '../../llm/llm.service';
@@ -23,7 +23,7 @@ export class QuestionService {
   constructor(
     private interview: InterviewService,
     private llm: LlmService,
-    private tts: TtsService,
+    private speech: SpeechService,
     private storage: StorageService,
   ) {}
 
@@ -70,7 +70,7 @@ export class QuestionService {
 
       // Get a buffer file and save to Google Cloud.
       const bufferFile: SynthesizeResponse =
-        await this.tts.synthesize(generatedQuestion);
+        await this.speech.synthesize(generatedQuestion);
       await this.storage.upload(bufferFile.audioContent as Buffer, path);
 
       // Update isDone and finalMessage field.
@@ -151,7 +151,7 @@ export class QuestionService {
     const generatedQuestion: string = await this.llm.generate(llmDto);
     // Get a buffer file and save to Google Cloud.
     const bufferFile: SynthesizeResponse =
-      await this.tts.synthesize(generatedQuestion);
+      await this.speech.synthesize(generatedQuestion);
     await this.storage.upload(bufferFile.audioContent as Buffer, path);
 
     const newQuestion: QuestionDto = {

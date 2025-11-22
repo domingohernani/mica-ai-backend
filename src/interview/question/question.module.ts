@@ -1,7 +1,7 @@
 import { forwardRef, Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { LlmModule } from 'src/llm/llm.module';
-import { TtsModule } from 'src/tts/tts.module';
+import { SpeechModule } from 'src/speech/speech.module';
 
 import { StorageModule } from '../../storage/storage.module';
 import { Interview } from '../entities/interview.entity';
@@ -16,7 +16,7 @@ import { QuestionService } from './question.service';
     TypeOrmModule.forFeature([Interview]),
     forwardRef(() => InterviewModule),
     LlmModule,
-    TtsModule,
+    SpeechModule,
     StorageModule,
   ],
 })
