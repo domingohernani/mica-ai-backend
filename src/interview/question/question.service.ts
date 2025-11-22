@@ -35,11 +35,6 @@ export class QuestionService {
     const interview: InterviewDto = await this.interview.find(interviewDto);
     const conversation: QuestionDto[] = interview.conversation;
 
-    // Get the current unanswered question. If undefined, it returns null, meaning
-    // all questions are answered, so proceed to calculation.
-    const currentQuestion: QuestionDto | null =
-      conversation.find((convo: QuestionDto) => !convo.isAnswered) ?? null;
-
     // Check if all questions are already answered.
     const isAllAnswered: boolean = conversation.every(
       (convo: QuestionDto) => convo.isAnswered,
@@ -55,7 +50,7 @@ export class QuestionService {
     // Case where all questions are alread answered.
     if (isAllAnswered) {
       // Eearly return do not recompute
-      if (interview.finalMessage) return interview;
+      if (interview.isDone) return interview;
 
       // Generate custom injected prompt.
       const previousConvo: QuestionDto = conversation[conversation.length - 1];
@@ -70,7 +65,7 @@ export class QuestionService {
       const generatedQuestion: string = await this.llm.generate(llmDto);
 
       // Get the Text-to-Speech signed url
-      const path: string = `${interviewDto._id.toString()}/${interviewDto._id.toString()}.mp3`;
+      const path: string = `${interviewDto._id.toString()}/${conversation.length}/message.mp3`;
       const signedUrl: string = await this.storage.sign(path);
 
       // Get a buffer file and save to Google Cloud.
@@ -79,45 +74,54 @@ export class QuestionService {
       await this.storage.upload(bufferFile.audioContent as Buffer, path);
 
       // Update isDone and finalMessage field.
-      const newInterview: InterviewDto = await this.interview.update<
-        InterviewDto,
-        '_id'
-      >(
+      await this.interview.update<InterviewDto, '_id'>(
         interviewDto,
         { _id: new ObjectId(interviewDto._id) },
         {
           isDone: true,
           finalMessage: generatedQuestion,
-          finalTtsSignedUrl: signedUrl,
         },
       );
+
+      const newInterview: InterviewDto = {
+        ...interview,
+        finalTtsSignedUrl: signedUrl,
+      };
 
       return newInterview;
     }
 
+    // Get the current unanswered question. If undefined, it returns null, meaning
+    // all questions are answered, so proceed to calculation.
+    const currentQuestion: QuestionDto | null =
+      conversation.find((convo: QuestionDto) => !convo.isAnswered) ?? null;
+
+    // Null check
     if (!currentQuestion) {
       throw new NotFoundException(
         `No questions remaining for interview with ID ${interviewDto._id}.`,
       );
     }
 
-    // Get the Text-to-Speech signed url
-    const path: string = `${interviewDto._id.toString()}/${currentQuestion._id.toString()}.mp3`;
-    const signedUrl: string = await this.storage.sign(path);
-
-    // Check if there's already AI generated response/question.
-    if (currentQuestion.aiQuestion)
-      return {
-        ...currentQuestion,
-        aiTtsSignedUrl: signedUrl,
-        _id: currentQuestion._id.toString(),
-      };
-
     // Get the index of the current question.
     const currentQuestionIndex: number = conversation.findIndex(
       (convo: QuestionDto) =>
         convo._id.toString() === currentQuestion._id.toString(),
     );
+
+    // Get the Text-to-Speech signed url
+    const path: string = `${interviewDto._id.toString()}/${currentQuestionIndex}/ai-question.mp3`;
+    const signedUrl: string = await this.storage.sign(path);
+
+    // Check if there's already AI generated response/question.
+    if (currentQuestion.aiQuestion) {
+      const response: GetQuestionDto = {
+        aiQuestion: currentQuestion.aiQuestion,
+        aiTtsSignedUrl: signedUrl,
+        _id: currentQuestion._id.toString(),
+      };
+      return response;
+    }
 
     // Check if the current question is the first question.
     // Injected prompt is a bit different on first, middle, and last question.
@@ -148,10 +152,7 @@ export class QuestionService {
     // Get a buffer file and save to Google Cloud.
     const bufferFile: SynthesizeResponse =
       await this.tts.synthesize(generatedQuestion);
-    await this.storage.upload(
-      bufferFile.audioContent as Buffer,
-      `${interviewDto._id.toString()}/${currentQuestion._id.toString()}.mp3`,
-    );
+    await this.storage.upload(bufferFile.audioContent as Buffer, path);
 
     const newQuestion: QuestionDto = {
       _id: currentQuestion._id,

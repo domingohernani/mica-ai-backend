@@ -7,6 +7,7 @@ import { Repository } from 'typeorm';
 import { GetParamDto } from '../common/schemas/get-param.schema';
 import { Interview } from './entities/interview.entity';
 import { InterviewDto } from './interview.dto';
+import { QuestionDto } from './question/question.dto';
 
 @Injectable()
 export class InterviewService {
@@ -23,14 +24,16 @@ export class InterviewService {
       where: { _id: id },
     });
 
+    // Checking if the interview is found. Throws an erorr if not found
     if (!interview) {
       throw new NotFoundException(
         `Interview with ID ${id.toString()} not found`,
       );
     }
+    const conversation: QuestionDto[] = interview.conversation;
 
     // Get the Text-to-Speech signed url
-    const path: string = `${interviewDto._id.toString()}/${interviewDto._id.toString()}.mp3`;
+    const path: string = `${interviewDto._id.toString()}/${conversation.length}/message.mp3`;
     const signedUrl: string = await this.storage.sign(path);
 
     const convertedInterview: InterviewDto = {
@@ -38,12 +41,6 @@ export class InterviewService {
       finalTtsSignedUrl: signedUrl,
     };
 
-    // Checking if the interview is found. Throws an error if not found
-    if (!interview) {
-      throw new NotFoundException(
-        `Interview with ID ${id.toString()} not found`,
-      );
-    }
     return convertedInterview;
   }
 

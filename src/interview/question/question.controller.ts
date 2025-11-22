@@ -1,4 +1,4 @@
-import { Controller, Get, Param } from '@nestjs/common';
+import { Body, Controller, Get, Param, Patch } from '@nestjs/common';
 
 import { type GetParamDto } from '../../common/schemas/get-param.schema';
 import { InterviewDto } from '../interview.dto';
@@ -15,4 +15,11 @@ export class QuestionController {
   ): Promise<GetQuestionDto | InterviewDto> {
     return await this.questionService.find(questionDto);
   }
+
+  //   @Patch()
+  //   async update(
+  //     @Body() updateDto: UpdateQuestionDto,
+  //   ): Promise<GetQuestionDto | InterviewDto> {
+  //     return await this.questionService.update(updateDto);
+  //   }
 }

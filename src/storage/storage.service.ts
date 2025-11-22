@@ -16,9 +16,9 @@ export class StorageService {
     this.bucket = 'recorded-temp';
   }
   // Update file on cloud
-  async upload(bufferFile: Buffer, fileName: string): Promise<void> {
+  async upload(bufferFile: Buffer, filePath: string): Promise<void> {
     const currentBucket: Bucket = this.client.bucket(this.bucket);
-    const file: File = currentBucket.file(fileName);
+    const file: File = currentBucket.file(filePath);
     await file.save(bufferFile);
   }
 

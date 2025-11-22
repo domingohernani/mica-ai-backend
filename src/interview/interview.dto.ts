@@ -11,5 +11,5 @@ export class InterviewDto {
   }[];
   readonly isDone: boolean;
   readonly finalMessage: string;
-  readonly finalTtsSignedUrl: string;
+  readonly finalTtsSignedUrl?: string;
 }
