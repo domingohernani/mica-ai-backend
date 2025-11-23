@@ -8,7 +8,7 @@ import { InterviewDto } from './interview.dto';
 import { InterviewService } from './interview.service';
 import { createInterviewSchema } from './schemas/create-interview.schema';
 
-@Controller('interview')
+@Controller('interviews')
 export class InterviewController {
   constructor(private readonly interviewService: InterviewService) {}
 

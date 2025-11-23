@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  InternalServerErrorException,
+  NotFoundException,
+} from '@nestjs/common';
 import { ObjectId } from 'mongodb';
 import { SpeechService } from 'src/speech/speech.service';
 import { StorageService } from 'src/storage/storage.service';
@@ -205,5 +209,80 @@ export class QuestionService {
     );
 
     return updatedConversation;
+  }
+
+  // Handle files, transcribe audio, store them in GCS, mark question answered (more specific operation)
+  async updateAndTransribe(
+    interviewDto: GetParamDto,
+    questionDto: GetParamDto,
+    files: {
+      answerAudio: Express.Multer.File[];
+      answerVideo: Express.Multer.File[];
+    },
+  ): Promise<GetQuestionDto | InterviewDto> {
+    // Use the find method of interview service.
+    const interview: InterviewDto = await this.interview.find(interviewDto);
+    const conversation: QuestionDto[] = interview.conversation;
+
+    // Get the current unanswered question.
+    const currentQuestion: QuestionDto | null =
+      conversation.find((convo: QuestionDto) => !convo.isAnswered) ?? null;
+
+    // Null check
+    if (!currentQuestion) {
+      throw new NotFoundException(
+        `No questions remaining for interview with ID ${interviewDto._id}.`,
+      );
+    }
+
+    // Get the index of the current question.
+    const currentQuestionIndex: number = conversation.findIndex(
+      (convo: QuestionDto) =>
+        convo._id.toString() === currentQuestion._id.toString(),
+    );
+
+    const rawPath: string = `${interviewDto._id.toString()}/${currentQuestionIndex}`;
+    const audioPath: string = rawPath.concat('/audio-answer.mp3');
+    const videoPath: string = rawPath.concat('/video-answer.mp4');
+    const bucketName: string = 'recorded-temp';
+
+    // Store the mp3 and mp4
+    await this.storage.upload(files.answerAudio[0].buffer, audioPath);
+    await this.storage.upload(files.answerVideo[0].buffer, videoPath);
+
+    // Transcribe the mp3
+    const uri: string = `gs://${bucketName}/${audioPath}`;
+    const answerTranscription: string | undefined =
+      await this.speech.transcribe(uri);
+
+    if (!answerTranscription) {
+      throw new InternalServerErrorException('Audio transcription failed.');
+    }
+
+    // Update fields the specific question or converstation
+    const updatedConversation: QuestionDto[] = conversation.map(
+      (_question: QuestionDto) => {
+        if (_question._id.toString() == questionDto._id.toString()) {
+          return {
+            _id: currentQuestion._id,
+            originalQuestion: currentQuestion.originalQuestion,
+            aiQuestion: currentQuestion.aiQuestion,
+            answer: answerTranscription,
+            isAnswered: true,
+          };
+        }
+        return _question;
+      },
+    );
+
+    // Update the conversation in the database using interview repository
+    await this.interview.update<InterviewDto, '_id'>(
+      interviewDto,
+      { _id: new ObjectId(interviewDto._id) },
+      { conversation: updatedConversation },
+    );
+
+    // Call and return the latest unanswered question
+    return await this.find(interviewDto);
   }
 }

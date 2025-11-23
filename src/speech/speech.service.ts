@@ -1,3 +1,4 @@
+import { protos, SpeechClient } from '@google-cloud/speech';
 import { TextToSpeechClient } from '@google-cloud/text-to-speech';
 import { Injectable } from '@nestjs/common';
 
@@ -8,10 +9,12 @@ import {
 
 @Injectable()
 export class SpeechService {
-  private client: TextToSpeechClient;
+  private clientTts: TextToSpeechClient;
+  private clientStt: SpeechClient;
 
   constructor() {
-    this.client = new TextToSpeechClient();
+    this.clientTts = new TextToSpeechClient();
+    this.clientStt = new SpeechClient();
   }
 
   async synthesize(text: string): Promise<SynthesizeResponse> {
@@ -27,10 +30,50 @@ export class SpeechService {
 
     // Type-safe assignment
     const result: [SynthesizeResponse, unknown, unknown] =
-      await this.client.synthesizeSpeech(request);
+      await this.clientTts.synthesizeSpeech(request);
 
     const response: SynthesizeResponse = result[0];
 
     return response;
+  }
+
+  async transcribe(uri: string): Promise<string | undefined> {
+    const audio: {
+      uri: string;
+    } = { uri: uri };
+
+    const config: {
+      encoding: protos.google.cloud.speech.v1.RecognitionConfig.AudioEncoding;
+      sampleRateHertz: number;
+      languageCode: string;
+      useEnhanced: boolean;
+      model: string;
+      enableAutomaticPunctuation: boolean;
+    } = {
+      encoding:
+        protos.google.cloud.speech.v1.RecognitionConfig.AudioEncoding.MP3,
+      sampleRateHertz: 16000,
+      languageCode: 'en-US',
+      useEnhanced: true,
+      model: 'latest_long',
+      enableAutomaticPunctuation: true,
+    };
+
+    const request = { config, audio };
+
+    const [operation] = await this.clientStt.longRunningRecognize(request);
+    const [response] = await operation.promise();
+
+    if (!response.results || !response.results.length) return '';
+
+    const transcript: string = response.results
+      .map(
+        (result: protos.google.cloud.speech.v1.ISpeechRecognitionResult) =>
+          result.alternatives?.[0]?.transcript,
+      )
+      .filter(Boolean)
+      .join(' ');
+
+    return transcript;
   }
 }
