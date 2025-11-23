@@ -4,11 +4,11 @@ import {
   Get,
   Param,
   Patch,
-  UploadedFiles,
+  UploadedFile,
   UseInterceptors,
   UsePipes,
 } from '@nestjs/common';
-import { FileFieldsInterceptor } from '@nestjs/platform-express';
+import { FileInterceptor } from '@nestjs/platform-express';
 import { ZodValidationPipe } from 'src/common/pipes/zod-validation.pipe';
 
 import { type GetParamDto } from '../../common/schemas/get-param.schema';
@@ -32,20 +32,12 @@ export class QuestionController {
   }
 
   @Patch('questions/:questionId')
-  @UseInterceptors(
-    FileFieldsInterceptor([
-      { name: 'answerAudio', maxCount: 1 },
-      { name: 'answerVideo', maxCount: 1 },
-    ]),
-  )
+  @UseInterceptors(FileInterceptor('video'))
   async update(
     @Param('_id') _id: string,
     @Param('questionId') questionId: string,
-    @UploadedFiles()
-    files: {
-      answerAudio: Express.Multer.File[];
-      answerVideo: Express.Multer.File[];
-    },
+    @UploadedFile()
+    file: Express.Multer.File,
   ): Promise<GetQuestionDto | InterviewDto> {
     const params: GetQuestionParamDto = { _id, questionId };
     const validated: GetQuestionParamDto = getQuestionParamSchema.parse(params);
@@ -53,7 +45,7 @@ export class QuestionController {
     return await this.questionService.updateAndTransribe(
       { _id: validated._id },
       { _id: validated.questionId },
-      files,
+      file,
     );
   }
 }

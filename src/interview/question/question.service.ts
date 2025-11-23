@@ -215,10 +215,7 @@ export class QuestionService {
   async updateAndTransribe(
     interviewDto: GetParamDto,
     questionDto: GetParamDto,
-    files: {
-      answerAudio: Express.Multer.File[];
-      answerVideo: Express.Multer.File[];
-    },
+    video: Express.Multer.File,
   ): Promise<GetQuestionDto | InterviewDto> {
     // Use the find method of interview service.
     const interview: InterviewDto = await this.interview.find(interviewDto);
@@ -242,21 +239,19 @@ export class QuestionService {
     );
 
     const rawPath: string = `${interviewDto._id.toString()}/${currentQuestionIndex}`;
-    const audioPath: string = rawPath.concat('/audio-answer.mp3');
     const videoPath: string = rawPath.concat('/video-answer.mp4');
     const bucketName: string = 'recorded-temp';
 
-    // Store the mp3 and mp4
-    await this.storage.upload(files.answerAudio[0].buffer, audioPath);
-    await this.storage.upload(files.answerVideo[0].buffer, videoPath);
+    // Store the mp4
+    await this.storage.upload(video.buffer, videoPath);
 
     // Transcribe the mp3
-    const uri: string = `gs://${bucketName}/${audioPath}`;
+    const uri: string = `gs://${bucketName}/${videoPath}`;
     const answerTranscription: string | undefined =
       await this.speech.transcribe(uri);
 
     if (!answerTranscription) {
-      throw new InternalServerErrorException('Audio transcription failed.');
+      throw new InternalServerErrorException('Video transcription failed.');
     }
 
     // Update fields the specific question or converstation
