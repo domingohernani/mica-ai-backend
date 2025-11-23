@@ -2,6 +2,7 @@ import { protos, SpeechClient } from '@google-cloud/speech';
 import { TextToSpeechClient } from '@google-cloud/text-to-speech';
 import { Injectable } from '@nestjs/common';
 
+import { TtsConfig, TtsRequest } from '../common/types/stt.types';
 import {
   SynthesizeRequest,
   SynthesizeResponse,
@@ -42,14 +43,7 @@ export class SpeechService {
       uri: string;
     } = { uri: uri };
 
-    const config: {
-      encoding: protos.google.cloud.speech.v1.RecognitionConfig.AudioEncoding;
-      sampleRateHertz: number;
-      languageCode: string;
-      useEnhanced: boolean;
-      model: string;
-      enableAutomaticPunctuation: boolean;
-    } = {
+    const config: TtsConfig = {
       encoding:
         protos.google.cloud.speech.v1.RecognitionConfig.AudioEncoding.MP3,
       sampleRateHertz: 16000,
@@ -59,7 +53,7 @@ export class SpeechService {
       enableAutomaticPunctuation: true,
     };
 
-    const request = { config, audio };
+    const request: TtsRequest = { config, audio };
 
     const [operation] = await this.clientStt.longRunningRecognize(request);
     const [response] = await operation.promise();
