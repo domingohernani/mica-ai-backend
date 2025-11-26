@@ -4,6 +4,7 @@ import {
   Get,
   Param,
   Patch,
+  Post,
   UploadedFile,
   UseInterceptors,
   UsePipes,
@@ -36,8 +37,7 @@ export class QuestionController {
   async update(
     @Param('_id') _id: string,
     @Param('questionId') questionId: string,
-    @UploadedFile()
-    file: Express.Multer.File,
+    @UploadedFile() videoBuffer: Buffer,
   ): Promise<GetQuestionDto | InterviewDto> {
     const params: GetQuestionParamDto = { _id, questionId };
     const validated: GetQuestionParamDto = getQuestionParamSchema.parse(params);
@@ -45,7 +45,31 @@ export class QuestionController {
     return await this.questionService.updateAndTransribe(
       { _id: validated._id },
       { _id: validated.questionId },
-      file,
+      videoBuffer,
+    );
+  }
+
+  @Post('questions/:questionId/chunk')
+  @UseInterceptors(FileInterceptor('chunk'))
+  async updateChunk(
+    @Param('_id') _id: string,
+    @Param('questionId') questionId: string,
+    @UploadedFile() chunk: Express.Multer.File,
+    @Body() body: { chunkNumber: string; isLastChunk: string },
+  ): Promise<void> {
+    const params: GetQuestionParamDto = { _id, questionId };
+    const validated: GetQuestionParamDto = getQuestionParamSchema.parse(params);
+
+    // Type conversion
+    const parsedChunkNumber: number = parseInt(body.chunkNumber, 10);
+    const parsedIsLastChunk: boolean = body.isLastChunk === 'true';
+
+    await this.questionService.updateByChunk(
+      { _id: validated._id },
+      { _id: validated.questionId },
+      parsedChunkNumber,
+      chunk,
+      parsedIsLastChunk,
     );
   }
 }

@@ -23,6 +23,9 @@ import type { GetQuestionDto } from './schemas/get-question.schema';
 
 @Injectable()
 export class QuestionService {
+  // For each upload session
+  private chunksMap: Map<string, Map<number, Buffer>> = new Map();
+
   // Inject the Interview repository to perform database operations
   constructor(
     private interview: InterviewService,
@@ -215,7 +218,7 @@ export class QuestionService {
   async updateAndTransribe(
     interviewDto: GetParamDto,
     questionDto: GetParamDto,
-    video: Express.Multer.File,
+    videoBuffer: Buffer,
   ): Promise<GetQuestionDto | InterviewDto> {
     // Use the find method of interview service.
     const interview: InterviewDto = await this.interview.find(interviewDto);
@@ -239,13 +242,13 @@ export class QuestionService {
     );
 
     const rawPath: string = `${interviewDto._id.toString()}/${currentQuestionIndex}`;
-    const videoPath: string = rawPath.concat('/video-answer.mp4');
+    const videoPath: string = rawPath.concat('/video-answer.webm');
     const bucketName: string = 'recorded-temp';
 
     // Store the mp4
-    await this.storage.upload(video.buffer, videoPath);
+    await this.storage.upload(videoBuffer, videoPath);
 
-    // Transcribe the mp3
+    // Transcribe the mp4
     const uri: string = `gs://${bucketName}/${videoPath}`;
     const answerTranscription: string | undefined =
       await this.speech.transcribe(uri);
@@ -279,5 +282,51 @@ export class QuestionService {
 
     // Call and return the latest unanswered question
     return await this.find(interviewDto);
+  }
+
+  async updateByChunk(
+    interviewDto: GetParamDto,
+    questionDto: GetParamDto,
+    chunkNumber: number,
+    chunk: Express.Multer.File,
+    isLastChunk: boolean,
+  ): Promise<void> {
+    const inteviewId: string = interviewDto._id.toString();
+    const questionId: string = questionDto._id.toString();
+    // Initialize map for this question if it doesn't exist
+    if (!this.chunksMap.has(questionId)) {
+      this.chunksMap.set(questionId, new Map<number, Buffer>());
+    }
+
+    // Get the map for this question
+    const questionChunks: Map<number, Buffer> | undefined =
+      this.chunksMap.get(questionId);
+
+    if (!questionChunks) {
+      throw new InternalServerErrorException(
+        `Failed to get the chunk storage for interview with ID ${inteviewId} at question with ID ${questionId}`,
+      );
+    }
+    // Store the chunk in the map using chunkNumber as key
+    questionChunks.set(chunkNumber, chunk.buffer);
+
+    // Check if last chunk
+    if (isLastChunk) {
+      // Sort chunks by chunkNumber and combine
+      const orderedChunks: Buffer[] = Array.from(questionChunks.keys())
+        .sort((a: number, b: number) => a - b)
+        .map((key: number) => {
+          const chunk: Buffer | undefined = questionChunks.get(key);
+          if (!chunk) throw new Error(`Missing chunk ${key}`);
+          return chunk;
+        });
+      const finalBuffer: Buffer = Buffer.concat(orderedChunks);
+
+      // Trigger your existing processing pipeline
+      await this.updateAndTransribe(interviewDto, questionDto, finalBuffer);
+
+      // Clean up
+      this.chunksMap.delete(questionId);
+    }
   }
 }
