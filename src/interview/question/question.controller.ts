@@ -56,7 +56,7 @@ export class QuestionController {
     @Param('questionId') questionId: string,
     @UploadedFile() chunk: Express.Multer.File,
     @Body() body: { chunkNumber: string; isLastChunk: string },
-  ): Promise<void> {
+  ): Promise<GetQuestionDto | InterviewDto | { isChunkStored: true }> {
     const params: GetQuestionParamDto = { _id, questionId };
     const validated: GetQuestionParamDto = getQuestionParamSchema.parse(params);
 
@@ -64,7 +64,7 @@ export class QuestionController {
     const parsedChunkNumber: number = parseInt(body.chunkNumber, 10);
     const parsedIsLastChunk: boolean = body.isLastChunk === 'true';
 
-    await this.questionService.updateByChunk(
+    return await this.questionService.updateByChunk(
       { _id: validated._id },
       { _id: validated.questionId },
       parsedChunkNumber,

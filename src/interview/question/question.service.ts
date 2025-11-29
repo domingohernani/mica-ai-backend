@@ -290,7 +290,7 @@ export class QuestionService {
     chunkNumber: number,
     chunk: Express.Multer.File,
     isLastChunk: boolean,
-  ): Promise<void> {
+  ): Promise<GetQuestionDto | InterviewDto | { isChunkStored: true }> {
     const inteviewId: string = interviewDto._id.toString();
     const questionId: string = questionDto._id.toString();
     // Initialize map for this question if it doesn't exist
@@ -322,11 +322,17 @@ export class QuestionService {
         });
       const finalBuffer: Buffer = Buffer.concat(orderedChunks);
 
-      // Trigger your existing processing pipeline
-      await this.updateAndTransribe(interviewDto, questionDto, finalBuffer);
-
       // Clean up
       this.chunksMap.delete(questionId);
+
+      // Trigger your existing processing pipeline
+      return await this.updateAndTransribe(
+        interviewDto,
+        questionDto,
+        finalBuffer,
+      );
     }
+
+    return { isChunkStored: true };
   }
 }
