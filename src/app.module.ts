@@ -8,6 +8,8 @@ import { InterviewModule } from './interview/interview.module';
 import { LlmModule } from './llm/llm.module';
 import { SpeechModule } from './speech/speech.module';
 import { StorageModule } from './storage/storage.module';
+import { AuthController } from './auth/auth.controller';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
@@ -21,8 +23,9 @@ import { StorageModule } from './storage/storage.module';
     InterviewModule,
     SpeechModule,
     StorageModule,
+    AuthModule,
   ],
-  controllers: [AppController],
+  controllers: [AppController, AuthController],
   providers: [AppService],
 })
 export class AppModule {}
