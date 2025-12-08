@@ -7,12 +7,13 @@ import {
   Post,
   UploadedFile,
   UseInterceptors,
-  UsePipes,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ZodValidationPipe } from 'src/common/pipes/zod-validation.pipe';
 
+import { User } from '../../common/decorators/user.decorator';
 import { type GetParamDto } from '../../common/schemas/get-param.schema';
+import type { User as UserType } from '../../common/types/user.types';
 import { InterviewDto } from '../interview.dto';
 import { getParamSchema } from './../../common/schemas/get-param.schema';
 import { QuestionService } from './question.service';
@@ -20,15 +21,20 @@ import type { GetQuestionDto } from './schemas/get-question.schema';
 import type { GetQuestionParamDto } from './schemas/get-question-param.schema';
 import { getQuestionParamSchema } from './schemas/get-question-param.schema';
 
+// TODO: modularize
+
 @Controller('interviews/:_id')
 export class QuestionController {
   constructor(private readonly questionService: QuestionService) {}
 
   @Get('questions')
-  @UsePipes(new ZodValidationPipe(getParamSchema))
   async find(
-    @Param() interviewDto: GetParamDto,
+    @Param(new ZodValidationPipe(getParamSchema))
+    interviewDto: GetParamDto,
+    @User() user: UserType,
   ): Promise<GetQuestionDto | InterviewDto> {
+    console.log(user);
+
     return await this.questionService.find(interviewDto);
   }
 

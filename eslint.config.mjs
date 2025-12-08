@@ -30,6 +30,8 @@ export default tseslint.config(
     rules: {
       // Force explicit types
       '@typescript-eslint/explicit-function-return-type': 'error',
+      '@typescript-eslint/no-unsafe-assignment': 'off',
+      "@typescript-eslint/no-unsafe-call": "off",
       '@typescript-eslint/typedef': [
         'error',
         {
