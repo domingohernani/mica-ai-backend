@@ -12,6 +12,11 @@ import { InterviewModule } from './interview/interview.module';
 import { LlmModule } from './llm/llm.module';
 import { SpeechModule } from './speech/speech.module';
 import { StorageModule } from './storage/storage.module';
+import { CompanyController } from './company/company.controller';
+import { CompanyModule } from './company/company.module';
+import { UserService } from './user/user.service';
+import { UserController } from './user/user.controller';
+import { UserModule } from './user/user.module';
 
 @Module({
   imports: [
@@ -26,14 +31,17 @@ import { StorageModule } from './storage/storage.module';
     SpeechModule,
     StorageModule,
     AuthModule,
+    CompanyModule,
+    UserModule,
   ],
-  controllers: [AppController, AuthController],
+  controllers: [AppController, AuthController, CompanyController, UserController],
   providers: [
     AppService,
     {
       provide: APP_GUARD,
       useClass: JwtGuard,
     },
+    UserService,
   ],
 })
 export class AppModule {}
