@@ -4,11 +4,12 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { ObjectId } from 'mongodb';
-import { SpeechService } from 'src/speech/speech.service';
-import { StorageService } from 'src/storage/storage.service';
 
 import { SynthesizeResponse } from '../../common/types/tts.types';
-import { LlmService } from '../../llm/llm.service';
+import { LlmService } from '../../infrastructure/llm/llm.service';
+import { CreateLlmDto } from '../../infrastructure/llm/schemas/create-llm.schema';
+import { SpeechService } from '../../infrastructure/speech/speech.service';
+import { StorageService } from '../../infrastructure/storage/storage.service';
 import {
   generateFirstQuestion,
   generateLastResponse,
@@ -16,7 +17,6 @@ import {
 } from '../../utils/generate-prompt';
 import { InterviewDto } from '../interview.dto';
 import { GetParamDto } from './../../common/schemas/get-param.schema';
-import { CreateLlmDto } from './../../llm/schemas/create-llm.schema';
 import { InterviewService } from './../interview.service';
 import { QuestionDto } from './question.dto';
 import type { GetQuestionDto } from './schemas/get-question.schema';

@@ -1,11 +1,10 @@
 import { Module } from '@nestjs/common';
 
-import { LlmController } from './llm.controller';
 import { LlmService } from './llm.service';
 
 @Module({
   providers: [LlmService],
-  controllers: [LlmController],
+  controllers: [],
   exports: [LlmService],
 })
 export class LlmModule {}

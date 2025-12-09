@@ -7,16 +7,16 @@ import { AppService } from './app.service';
 import { AuthController } from './auth/auth.controller';
 import { AuthModule } from './auth/auth.module';
 import { JwtGuard } from './auth/guards/jwt.guard';
-import { Interview } from './interview/entities/interview.entity';
-import { InterviewModule } from './interview/interview.module';
-import { LlmModule } from './llm/llm.module';
-import { SpeechModule } from './speech/speech.module';
-import { StorageModule } from './storage/storage.module';
 import { CompanyController } from './company/company.controller';
 import { CompanyModule } from './company/company.module';
-import { UserService } from './user/user.service';
+import { LlmModule } from './infrastructure/llm/llm.module';
+import { SpeechModule } from './infrastructure/speech/speech.module';
+import { StorageModule } from './infrastructure/storage/storage.module';
+import { Interview } from './interview/entities/interview.entity';
+import { InterviewModule } from './interview/interview.module';
 import { UserController } from './user/user.controller';
 import { UserModule } from './user/user.module';
+import { UserService } from './user/user.service';
 
 @Module({
   imports: [
@@ -34,7 +34,12 @@ import { UserModule } from './user/user.module';
     CompanyModule,
     UserModule,
   ],
-  controllers: [AppController, AuthController, CompanyController, UserController],
+  controllers: [
+    AppController,
+    AuthController,
+    CompanyController,
+    UserController,
+  ],
   providers: [
     AppService,
     {

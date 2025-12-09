@@ -5,7 +5,7 @@ import { AppModule } from './app.module';
 
 async function bootstrap() {
   // Google Cloud Config
-  const keyPath: string = path.join(__dirname, '../src/keys/mica-ai.json');
+  const keyPath: string = path.join(__dirname, '../keys/mica-ai.json');
   process.env.GOOGLE_APPLICATION_CREDENTIALS = keyPath;
 
   const app = await NestFactory.create(AppModule);

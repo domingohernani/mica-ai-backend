@@ -1,9 +1,9 @@
 import { forwardRef, Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { LlmModule } from 'src/llm/llm.module';
-import { SpeechModule } from 'src/speech/speech.module';
 
-import { StorageModule } from '../../storage/storage.module';
+import { LlmModule } from '../../infrastructure/llm/llm.module';
+import { SpeechModule } from '../../infrastructure/speech/speech.module';
+import { StorageModule } from '../../infrastructure/storage/storage.module';
 import { Interview } from '../entities/interview.entity';
 import { InterviewModule } from '../interview.module';
 import { QuestionController } from './question.controller';
