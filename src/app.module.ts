@@ -12,9 +12,8 @@ import { SpeechModule } from './infrastructure/speech/speech.module';
 import { StorageModule } from './infrastructure/storage/storage.module';
 import { Interview } from './interview/entities/interview.entity';
 import { InterviewModule } from './interview/interview.module';
-import { OrganizationController } from './organization/organization.controller';
+import { Organization } from './organization/entities/organization.entity';
 import { OrganizationModule } from './organization/organization.module';
-import { OrganizationService } from './organization/organization.service';
 import { User } from './user/entities/user.entity';
 import { UserModule } from './user/user.module';
 
@@ -24,7 +23,7 @@ import { UserModule } from './user/user.module';
       type: 'mongodb',
       url: process.env.MONGODB_URI,
       synchronize: true, // TODO: remove in production
-      entities: [Interview, User],
+      entities: [Interview, User, Organization],
     }),
     LlmModule,
     InterviewModule,
@@ -34,14 +33,13 @@ import { UserModule } from './user/user.module';
     UserModule,
     OrganizationModule,
   ],
-  controllers: [AppController, AuthController, OrganizationController],
+  controllers: [AppController, AuthController],
   providers: [
     AppService,
     {
       provide: APP_GUARD,
       useClass: JwtGuard,
     },
-    OrganizationService,
   ],
 })
 export class AppModule {}
