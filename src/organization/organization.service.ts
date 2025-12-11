@@ -10,7 +10,6 @@ import { CreateOrganizationDto } from './schemas/create-organization.schema';
 @Injectable()
 export class OrganizationService {
   // Inject the Interview repository to perform database operations
-
   constructor(
     @InjectRepository(Organization)
     private readonly organization: Repository<Organization>,
