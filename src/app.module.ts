@@ -14,9 +14,8 @@ import { SpeechModule } from './infrastructure/speech/speech.module';
 import { StorageModule } from './infrastructure/storage/storage.module';
 import { Interview } from './interview/entities/interview.entity';
 import { InterviewModule } from './interview/interview.module';
-import { UserController } from './user/user.controller';
+import { User } from './user/entities/user.entity';
 import { UserModule } from './user/user.module';
-import { UserService } from './user/user.service';
 
 @Module({
   imports: [
@@ -24,7 +23,7 @@ import { UserService } from './user/user.service';
       type: 'mongodb',
       url: process.env.MONGODB_URI,
       synchronize: true, // TODO: remove in production
-      entities: [Interview],
+      entities: [Interview, User],
     }),
     LlmModule,
     InterviewModule,
@@ -34,19 +33,13 @@ import { UserService } from './user/user.service';
     CompanyModule,
     UserModule,
   ],
-  controllers: [
-    AppController,
-    AuthController,
-    CompanyController,
-    UserController,
-  ],
+  controllers: [AppController, AuthController, CompanyController],
   providers: [
     AppService,
     {
       provide: APP_GUARD,
       useClass: JwtGuard,
     },
-    UserService,
   ],
 })
 export class AppModule {}
