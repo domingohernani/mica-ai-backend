@@ -6,13 +6,13 @@ import type { CreateUserDto } from './schemas/create-user.schema';
 import { createUserSchema } from './schemas/create-user.schema';
 import { UserService } from './user.service';
 
-@Controller('user')
+@Controller('users')
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
   @Post()
   @UsePipes(new ZodValidationPipe(createUserSchema))
-  create(@Body() userDto: CreateUserDto): Promise<User> {
-    return this.userService.create(userDto);
+  async create(@Body() userDto: CreateUserDto): Promise<User> {
+    return await this.userService.create(userDto);
   }
 }
