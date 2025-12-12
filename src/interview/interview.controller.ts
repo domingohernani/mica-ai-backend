@@ -3,7 +3,6 @@ import { ZodValidationPipe } from 'src/common/pipes/zod-validation.pipe';
 
 import type { GetParamDto } from '../common/schemas/get-param.schema';
 import { getParamSchema } from '../common/schemas/get-param.schema';
-import { Interview } from './entities/interview.entity';
 import { InterviewDto } from './interview.dto';
 import { InterviewService } from './interview.service';
 import { createInterviewSchema } from './schemas/create-interview.schema';
@@ -20,7 +19,7 @@ export class InterviewController {
 
   @Post()
   @UsePipes(new ZodValidationPipe(createInterviewSchema))
-  async create(@Body() interviewDto: InterviewDto): Promise<Interview> {
+  async create(@Body() interviewDto: InterviewDto): Promise<InterviewDto> {
     return await this.interviewService.create(interviewDto);
   }
 }
