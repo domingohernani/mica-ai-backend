@@ -2,7 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ObjectId } from 'mongodb';
 import { StorageService } from 'src/infrastructure/storage/storage.service';
-import { Repository } from 'typeorm';
+import { MongoRepository } from 'typeorm';
 
 import { GetParamDto } from '../common/schemas/get-param.schema';
 import { Interview } from './entities/interview.entity';
@@ -13,7 +13,7 @@ import { QuestionDto } from './question/question.dto';
 export class InterviewService {
   // Inject the Interview repository to perform database operations
   constructor(
-    @InjectRepository(Interview) private interview: Repository<Interview>,
+    @InjectRepository(Interview) private interview: MongoRepository<Interview>,
     private storage: StorageService,
   ) {}
 
