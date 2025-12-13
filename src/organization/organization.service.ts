@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ObjectId } from 'mongodb';
 import { GetParamDto } from 'src/common/schemas/get-param.schema';
@@ -50,11 +50,11 @@ export class OrganizationService {
     });
 
     // Check if the organization exist
-    if (!organizations.length) {
-      throw new NotFoundException(
-        `No organization found for ID ${organizationDto._id}.`,
-      );
-    }
+    // if (!organizations.length) {
+    //   throw new NotFoundException(
+    //     `No organization found for ID ${organizationDto._id}.`,
+    //   );
+    // }
 
     // Convert the _id to string
     const convertedOrganizations: GetOrganizationDto[] = organizations.map(
