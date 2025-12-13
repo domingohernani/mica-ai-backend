@@ -7,6 +7,14 @@ export class Organization {
 
   @Column()
   name: string;
+  @Column()
+  // members: Member[];
+  members: {
+    userId: ObjectId;
+    role: string;
+    joinedAt: Date;
+  }[];
+
   @Column({ type: 'string' })
   createdBy: ObjectId;
   @Column()
