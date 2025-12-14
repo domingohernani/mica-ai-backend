@@ -1,7 +1,11 @@
-import { createParamDecorator, ExecutionContext } from '@nestjs/common';
+import {
+  BadRequestException,
+  createParamDecorator,
+  ExecutionContext,
+} from '@nestjs/common';
 
 import { User as UserEntity } from '../../user/entities/user.entity';
-import type { User as UserType } from '../types/user.types';
+import { GetUserDto } from '../schemas/get-user.schema';
 
 export const User: ReturnType<typeof createParamDecorator> =
   createParamDecorator((_: unknown, context: ExecutionContext) => {
@@ -10,11 +14,16 @@ export const User: ReturnType<typeof createParamDecorator> =
     // Get the user at the req object
     const userReq: UserEntity = request['appUser'];
 
+    console.log(userReq);
+
+    if (!userReq._id || !userReq.email || !userReq.userName)
+      throw new BadRequestException('Invalid user object in request');
+
     // Create a user
-    const user: UserType = {
-      id: userReq['sub'],
-      email: userReq[`${process.env.AUTH0_AUDIENCE}/email`],
-      name: userReq[`${process.env.AUTH0_AUDIENCE}/name`],
+    const user: GetUserDto = {
+      _id: userReq['_id'].toString(),
+      email: userReq['email'],
+      userName: userReq['userName'],
     };
 
     return user;

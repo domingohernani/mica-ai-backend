@@ -2,13 +2,15 @@ import {
   CanActivate,
   ExecutionContext,
   Injectable,
+  NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 
-import { User as UserType } from '../../common/types/user.types';
+import { JwtPayload } from '../../auth/types/jwt-payload.type';
 import { User } from '../../user/entities/user.entity';
-import { UserService } from './../../user/user.service';
+import { UserService } from '../../user/user.service';
+import type { GetUserDto } from '../schemas/get-user.schema';
 
 @Injectable()
 export class UserGuard implements CanActivate {
@@ -28,15 +30,29 @@ export class UserGuard implements CanActivate {
 
     const request: Request = context.switchToHttp().getRequest();
     // Get the user at the req object
-    const user: UserType = request['user'];
+    const user: JwtPayload = request['user'];
 
     if (!user) {
-      throw new UnauthorizedException();
+      throw new UnauthorizedException(
+        'Missing or invalid authentication token',
+      );
     }
 
     // Find the user using sub
-    const appUser: User = await this.userService.findByAuth0Sub(user.id);
-    request['appUser'] = appUser;
+    const appUser: User = await this.userService.findByAuth0Sub(user.sub);
+
+    // Validate user properties
+    if (!appUser._id || !appUser.email || !appUser.userName)
+      throw new NotFoundException(`User not found`);
+
+    // Create a user DTO object
+    const appUserDto: GetUserDto = {
+      _id: appUser._id?.toString(),
+      email: appUser.email,
+      userName: appUser.userName,
+    };
+
+    request['appUser'] = appUserDto;
     return true;
   }
 }

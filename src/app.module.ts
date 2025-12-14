@@ -7,6 +7,7 @@ import { AppService } from './app.service';
 import { AuthController } from './auth/auth.controller';
 import { AuthModule } from './auth/auth.module';
 import { JwtGuard } from './auth/guards/jwt.guard';
+import { UserGuard } from './common/guards/user.guard';
 import { LlmModule } from './infrastructure/llm/llm.module';
 import { SpeechModule } from './infrastructure/speech/speech.module';
 import { StorageModule } from './infrastructure/storage/storage.module';
@@ -16,7 +17,6 @@ import { Organization } from './organization/entities/organization.entity';
 import { OrganizationModule } from './organization/organization.module';
 import { User } from './user/entities/user.entity';
 import { UserModule } from './user/user.module';
-import { UserGuard } from './auth/guards/user.guard';
 
 @Module({
   imports: [

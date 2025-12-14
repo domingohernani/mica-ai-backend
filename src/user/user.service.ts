@@ -38,7 +38,7 @@ export class UserService {
   async findByAuth0Sub(sub: string): Promise<User> {
     // Check fisrt if already exist
     const user: User | null = await this.user.findOne({
-      where: { sub },
+      where: { sub: sub },
     });
 
     if (!user) {
