@@ -2,11 +2,11 @@ import { protos, SpeechClient } from '@google-cloud/speech';
 import { TextToSpeechClient } from '@google-cloud/text-to-speech';
 import { Injectable } from '@nestjs/common';
 
-import { TtsConfig, TtsRequest } from '../../common/types/stt.types';
+import { TtsConfig, TtsRequest } from '../../common/types/stt.type';
 import {
   SynthesizeRequest,
   SynthesizeResponse,
-} from '../../common/types/tts.types';
+} from '../../common/types/tts.type';
 
 @Injectable()
 export class SpeechService {

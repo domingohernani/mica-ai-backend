@@ -5,7 +5,7 @@ import {
 } from '@nestjs/common';
 import { ObjectId } from 'mongodb';
 
-import { SynthesizeResponse } from '../../common/types/tts.types';
+import { SynthesizeResponse } from '../../common/types/tts.type';
 import { LlmService } from '../../infrastructure/llm/llm.service';
 import { CreateLlmDto } from '../../infrastructure/llm/schemas/create-llm.schema';
 import { SpeechService } from '../../infrastructure/speech/speech.service';

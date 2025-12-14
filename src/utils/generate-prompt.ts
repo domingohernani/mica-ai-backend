@@ -1,6 +1,6 @@
-import type { GenerateFirstQuestion } from '../common/types/prompt.types';
-import type { GenerateQuestion } from '../common/types/prompt.types';
-import type { GenerateLastResponse } from '../common/types/prompt.types';
+import type { GenerateFirstQuestion } from '../common/types/prompt.type';
+import type { GenerateQuestion } from '../common/types/prompt.type';
+import type { GenerateLastResponse } from '../common/types/prompt.type';
 
 export const generateFirstQuestion: GenerateFirstQuestion = (
   question: string,
