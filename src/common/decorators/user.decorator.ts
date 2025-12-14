@@ -14,16 +14,25 @@ export const User: ReturnType<typeof createParamDecorator> =
     // Get the user at the req object
     const userReq: UserEntity = request['appUser'];
 
-    console.log(userReq);
-
-    if (!userReq._id || !userReq.email || !userReq.userName)
+    // Ensure user properties are valid
+    if (
+      !userReq?._id ||
+      !userReq.email ||
+      !userReq.firstName ||
+      !userReq.lastName
+    )
       throw new BadRequestException('Invalid user object in request');
 
     // Create a user
     const user: GetUserDto = {
       _id: userReq['_id'].toString(),
+      sub: userReq['sub'],
       email: userReq['email'],
-      userName: userReq['userName'],
+      firstName: userReq['firstName'],
+      lastName: userReq['lastName'],
+      isVerified: userReq['isVerified'],
+      createdAt: userReq['createdAt'],
+      updatedAt: userReq['updatedAt'],
     };
 
     return user;

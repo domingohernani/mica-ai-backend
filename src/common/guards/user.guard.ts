@@ -2,13 +2,11 @@ import {
   CanActivate,
   ExecutionContext,
   Injectable,
-  NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 
 import { JwtPayload } from '../../auth/types/jwt-payload.type';
-import { User } from '../../user/entities/user.entity';
 import { UserService } from '../../user/user.service';
 import type { GetUserDto } from '../schemas/get-user.schema';
 
@@ -39,20 +37,15 @@ export class UserGuard implements CanActivate {
     }
 
     // Find the user using sub
-    const appUser: User = await this.userService.findByAuth0Sub(user.sub);
+    const appUser: GetUserDto | null = await this.userService.findByAuth0Sub(
+      user.sub,
+    );
 
-    // Validate user properties
-    if (!appUser._id || !appUser.email || !appUser.userName)
-      throw new NotFoundException(`User not found`);
+    // Skip if the no registered user
+    if (!appUser || !appUser._id) return true;
 
-    // Create a user DTO object
-    const appUserDto: GetUserDto = {
-      _id: appUser._id?.toString(),
-      email: appUser.email,
-      userName: appUser.userName,
-    };
-
-    request['appUser'] = appUserDto;
+    // TODO: include a role at appUser, probably use the organization and check the member array
+    request['appUser'] = appUser;
     return true;
   }
 }

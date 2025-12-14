@@ -10,11 +10,11 @@ export class User {
   @Column()
   email: string;
   @Column()
-  userName: string;
+  firstName: string;
+  @Column()
+  lastName: string;
   @Column()
   isVerified: boolean;
-  @Column()
-  pictureUrl: string;
   @Column()
   createdAt: Date;
   @Column()

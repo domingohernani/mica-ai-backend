@@ -3,17 +3,15 @@ import z, { ZodType } from 'zod';
 export const createUserSchema: ZodType<{
   sub: string;
   email: string;
-  userName: string;
+  firstName: string;
+  lastName: string;
   isVerified: boolean;
-  pictureUrl: string;
-  // createdAt: string;
-  // updatedAt: string;
 }> = z.object({
   sub: z.string(),
-  userName: z.string(),
-  email: z.string(),
+  email: z.email(),
+  firstName: z.string(),
+  lastName: z.string(),
   isVerified: z.boolean(),
-  pictureUrl: z.string(),
   // createdAt: z
   //   .string()
   //   .default('')

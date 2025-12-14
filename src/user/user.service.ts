@@ -1,10 +1,11 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { MongoRepository } from 'typeorm';
 
 import now from '../utils/dates/now';
 import { User } from './entities/user.entity';
 import { CreateUserDto } from './schemas/create-user.schema';
+import { GetUserDto } from '../common/schemas/get-user.schema';
 
 @Injectable()
 export class UserService {
@@ -35,16 +36,19 @@ export class UserService {
   }
 
   // Find the user associated with the sub(given by auth0)
-  async findByAuth0Sub(sub: string): Promise<User> {
+  async findByAuth0Sub(sub: string): Promise<GetUserDto | null> {
     // Check fisrt if already exist
     const user: User | null = await this.user.findOne({
       where: { sub: sub },
     });
 
-    if (!user) {
-      throw new NotFoundException(`User not found`);
-    }
+    if (!user || !user._id) return null;
 
-    return user;
+    // Create a user dto
+    const userDto: GetUserDto = {
+      ...user,
+      _id: user._id.toString(),
+    };
+    return userDto;
   }
 }
