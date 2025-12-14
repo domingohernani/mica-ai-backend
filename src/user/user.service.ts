@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { MongoRepository } from 'typeorm';
 
@@ -32,5 +32,19 @@ export class UserService {
     const newUser: User = this.user.create(newUserDto);
     // Return and save into the database
     return await this.user.save(newUser);
+  }
+
+  // Find the user associated with the sub(given by auth0)
+  async findByAuth0Sub(sub: string): Promise<User> {
+    // Check fisrt if already exist
+    const user: User | null = await this.user.findOne({
+      where: { sub },
+    });
+
+    if (!user) {
+      throw new NotFoundException(`User not found`);
+    }
+
+    return user;
   }
 }

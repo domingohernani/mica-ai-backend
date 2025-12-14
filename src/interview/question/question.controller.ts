@@ -11,9 +11,7 @@ import {
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ZodValidationPipe } from 'src/common/pipes/zod-validation.pipe';
 
-import { User } from '../../common/decorators/user.decorator';
 import { type GetParamDto } from '../../common/schemas/get-param.schema';
-import type { User as UserType } from '../../common/types/user.types';
 import { InterviewDto } from '../interview.dto';
 import { getParamSchema } from './../../common/schemas/get-param.schema';
 import { QuestionService } from './question.service';
@@ -31,10 +29,7 @@ export class QuestionController {
   async find(
     @Param(new ZodValidationPipe(getParamSchema))
     interviewDto: GetParamDto,
-    @User() user: UserType,
   ): Promise<GetQuestionDto | InterviewDto> {
-    console.log(user);
-
     return await this.questionService.find(interviewDto);
   }
 
