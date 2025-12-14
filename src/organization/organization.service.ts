@@ -49,13 +49,6 @@ export class OrganizationService {
       where: { 'members.userId': id },
     });
 
-    // Check if the organization exist
-    // if (!organizations.length) {
-    //   throw new NotFoundException(
-    //     `No organization found for ID ${organizationDto._id}.`,
-    //   );
-    // }
-
     // Convert the _id to string
     const convertedOrganizations: GetOrganizationDto[] = organizations.map(
       (organization: Organization) => ({
