@@ -2,10 +2,10 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { MongoRepository } from 'typeorm';
 
+import { GetUserDto } from '../common/schemas/get-user.schema';
 import now from '../utils/dates/now';
 import { User } from './entities/user.entity';
 import { CreateUserDto } from './schemas/create-user.schema';
-import { GetUserDto } from '../common/schemas/get-user.schema';
 
 @Injectable()
 export class UserService {
