@@ -19,18 +19,21 @@ export class OrganizationService {
   ) {}
 
   // Create organization
-  async create(organizationDto: CreateOrganizationDto): Promise<Organization> {
+  async create(
+    userId: string,
+    organizationDto: CreateOrganizationDto,
+  ): Promise<Organization> {
     // Adding and modifying necessary properties
     const newOrganizationDto: Organization = {
       ...organizationDto,
       members: [
         {
-          userId: new ObjectId(organizationDto.createdBy),
-          role: Roles.Owner,
+          userId: new ObjectId(userId),
+          role: Roles.Owner, // The one created the organization will be the Owner
           joinedAt: now(),
         },
       ],
-      createdBy: new ObjectId(organizationDto.createdBy),
+      createdBy: new ObjectId(userId),
       createdAt: now(),
       updatedAt: now(),
     };

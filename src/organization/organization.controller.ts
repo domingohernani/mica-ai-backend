@@ -1,5 +1,7 @@
 import { Body, Controller, Get, Param, Post, UsePipes } from '@nestjs/common';
 
+import { User } from '../common/decorators/user.decorator';
+import type { GetUserDto } from '../common/schemas/get-user.schema';
 import { ZodValidationPipe } from './../common/pipes/zod-validation.pipe';
 import type { GetParamDto } from './../common/schemas/get-param.schema';
 import { getParamSchema } from './../common/schemas/get-param.schema';
@@ -15,11 +17,12 @@ export class OrganizationController {
 
   // Creation of organization
   @Post()
-  @UsePipes(new ZodValidationPipe(createOrganizationSchema))
   async create(
-    @Body() organizationDto: CreateOrganizationDto,
+    @Body(new ZodValidationPipe(createOrganizationSchema))
+    organizationDto: CreateOrganizationDto,
+    @User() user: GetUserDto,
   ): Promise<Organization> {
-    return await this.organizationService.create(organizationDto);
+    return await this.organizationService.create(user._id, organizationDto);
   }
 
   // Get the organizations of the user
