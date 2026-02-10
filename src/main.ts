@@ -1,9 +1,13 @@
 import { NestFactory } from '@nestjs/core';
+import dns from 'dns/promises';
 import path from 'path';
 
 import { AppModule } from './app.module';
 
-async function bootstrap() {
+async function bootstrap(): Promise<void> {
+  // To fix Error: querySrv ECONNREFUSED
+  dns.setServers(['1.1.1.1']);
+
   // Google Cloud Config
   const keyPath: string = path.join(__dirname, '../keys/mica-ai.json');
   process.env.GOOGLE_APPLICATION_CREDENTIALS = keyPath;
