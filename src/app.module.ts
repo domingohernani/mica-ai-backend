@@ -13,11 +13,12 @@ import { SpeechModule } from './infrastructure/speech/speech.module';
 import { StorageModule } from './infrastructure/storage/storage.module';
 import { Interview } from './interview/entities/interview.entity';
 import { InterviewModule } from './interview/interview.module';
+import { Job } from './job/entities/job.entity';
+import { JobModule } from './job/job.module';
 import { Organization } from './organization/entities/organization.entity';
 import { OrganizationModule } from './organization/organization.module';
 import { User } from './user/entities/user.entity';
 import { UserModule } from './user/user.module';
-import { JobModule } from './job/job.module';
 
 @Module({
   imports: [
@@ -25,7 +26,7 @@ import { JobModule } from './job/job.module';
       type: 'mongodb',
       url: process.env.MONGODB_URI,
       synchronize: true, // TODO: remove in production
-      entities: [Interview, User, Organization],
+      entities: [Interview, User, Organization, Job],
     }),
     LlmModule,
     InterviewModule,
