@@ -30,6 +30,7 @@ export const User: ReturnType<typeof createParamDecorator> =
       email: userReq['email'],
       firstName: userReq['firstName'],
       lastName: userReq['lastName'],
+      profileUrl: userReq['profileUrl'],
       isVerified: userReq['isVerified'],
       createdAt: userReq['createdAt'],
       updatedAt: userReq['updatedAt'],

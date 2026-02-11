@@ -5,12 +5,14 @@ export const createUserSchema: ZodType<{
   email: string;
   firstName: string;
   lastName: string;
+  profileUrl: string;
   isVerified: boolean;
 }> = z.object({
   sub: z.string(),
   email: z.email(),
   firstName: z.string(),
   lastName: z.string(),
+  profileUrl: z.url(),
   isVerified: z.boolean(),
   // createdAt: z
   //   .string()

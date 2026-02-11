@@ -14,6 +14,8 @@ export class User {
   @Column()
   lastName: string;
   @Column()
+  profileUrl: string;
+  @Column()
   isVerified: boolean;
   @Column()
   createdAt: Date;

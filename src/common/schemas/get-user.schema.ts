@@ -6,6 +6,7 @@ export const getUserSchema: ZodType<{
   email: string;
   firstName: string;
   lastName: string;
+  profileUrl: string;
   isVerified: boolean;
   createdAt: Date;
   updatedAt: Date;
@@ -16,6 +17,7 @@ export const getUserSchema: ZodType<{
   email: z.email(),
   firstName: z.string(),
   lastName: z.string(),
+  profileUrl: z.url(),
   isVerified: z.boolean(),
   createdAt: z.date(),
   updatedAt: z.date(),
