@@ -1,9 +1,13 @@
-import { Body, Injectable } from '@nestjs/common';
+import { Body, Injectable, Param, Patch, UsePipes } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ObjectId } from 'mongodb';
 import { MongoRepository } from 'typeorm';
 
 import { ZodValidationPipe } from '../common/pipes/zod-validation.pipe';
+import {
+  type GetParamDto,
+  getParamSchema,
+} from '../common/schemas/get-param.schema';
 import now from '../utils/dates/now';
 import { Status } from './constants/status';
 import { Job } from './entities/job.entity';
@@ -11,6 +15,7 @@ import {
   type CreateJobDto,
   createJobSchema,
 } from './schemas/create-job.schema';
+import { type UpdateJobDto } from './schemas/update-job.schema';
 
 @Injectable()
 export class JobService {
@@ -38,5 +43,13 @@ export class JobService {
     const newJob: Job = this.job.create(newJobDto);
     // Return and save into the database
     return await this.job.save(newJob);
+  }
+
+  // Update Job
+  update(@Param() jobId: GetParamDto, @Body() jobBody: UpdateJobDto): void {
+    console.log(jobId);
+    console.log(jobBody);
+
+    return;
   }
 }

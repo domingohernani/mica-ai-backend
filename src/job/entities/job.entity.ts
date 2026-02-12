@@ -8,7 +8,9 @@ export class Job {
   @Column({ type: 'string' })
   organizationId: ObjectId;
   @Column()
-  title: string;
+  position: string;
+  @Column()
+  description: string;
   @Column()
   status: string;
   @Column({ type: 'string' })
