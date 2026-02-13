@@ -3,7 +3,6 @@ import {
   InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
-import { ObjectId } from 'mongodb';
 
 import { SynthesizeResponse } from '../../common/types/tts.type';
 import { LlmService } from '../../infrastructure/llm/llm.service';
@@ -40,10 +39,10 @@ export class QuestionService {
   ): Promise<GetQuestionDto | InterviewDto> {
     // Use the find method of interview service.
     const interview: InterviewDto = await this.interview.find(interviewDto);
-    const conversation: QuestionDto[] = interview.conversation;
+    const conversations: QuestionDto[] = interview.conversations;
 
     // Check if all questions are already answered.
-    const isAllAnswered: boolean = conversation.every(
+    const isAllAnswered: boolean = conversations.every(
       (convo: QuestionDto) => convo.isAnswered,
     );
 
@@ -60,7 +59,8 @@ export class QuestionService {
       if (interview.isDone) return interview;
 
       // Generate custom injected prompt.
-      const previousConvo: QuestionDto = conversation[conversation.length - 1];
+      const previousConvo: QuestionDto =
+        conversations[conversations.length - 1];
       const previousQuestion: string = previousConvo.originalQuestion;
       const previousAnswer: string = previousConvo.answer;
       const prompt: string = generateLastResponse(
@@ -72,7 +72,7 @@ export class QuestionService {
       const generatedQuestion: string = await this.llm.generate(llmDto);
 
       // Get the Text-to-Speech signed url
-      const path: string = `${interviewDto._id.toString()}/${conversation.length}/message.mp3`;
+      const path: string = `${interviewDto.id}/${conversations.length}/message.mp3`;
       const signedUrl: string = await this.storage.sign(path);
 
       // Get a buffer file and save to Google Cloud.
@@ -81,9 +81,9 @@ export class QuestionService {
       await this.storage.upload(bufferFile.audioContent as Buffer, path);
 
       // Update isDone and finalMessage field.
-      await this.interview.update<InterviewDto, '_id'>(
+      await this.interview.update<InterviewDto, 'id'>(
         interviewDto,
-        { _id: new ObjectId(interviewDto._id) },
+        { id: interviewDto.id },
         {
           isDone: true,
           finalMessage: generatedQuestion,
@@ -101,23 +101,22 @@ export class QuestionService {
     // Get the current unanswered question. If undefined, it returns null, meaning
     // all questions are answered, so proceed to calculation.
     const currentQuestion: QuestionDto | null =
-      conversation.find((convo: QuestionDto) => !convo.isAnswered) ?? null;
+      conversations.find((convo: QuestionDto) => !convo.isAnswered) ?? null;
 
     // Null check
     if (!currentQuestion) {
       throw new NotFoundException(
-        `No questions remaining for interview with ID ${interviewDto._id}.`,
+        `No questions remaining for interview with ID ${interviewDto.id}.`,
       );
     }
 
     // Get the index of the current question.
-    const currentQuestionIndex: number = conversation.findIndex(
-      (convo: QuestionDto) =>
-        convo._id.toString() === currentQuestion._id.toString(),
+    const currentQuestionIndex: number = conversations.findIndex(
+      (convo: QuestionDto) => convo.id === currentQuestion.id,
     );
 
     // Get the Text-to-Speech signed url
-    const path: string = `${interviewDto._id.toString()}/${currentQuestionIndex}/ai-question.mp3`;
+    const path: string = `${interviewDto.id}/${currentQuestionIndex}/ai-question.mp3`;
     const signedUrl: string = await this.storage.sign(path);
 
     // Check if there's already AI generated response/question.
@@ -125,7 +124,7 @@ export class QuestionService {
       const response: GetQuestionDto = {
         aiQuestion: currentQuestion.aiQuestion,
         aiTtsSignedUrl: signedUrl,
-        _id: currentQuestion._id.toString(),
+        id: currentQuestion.id,
       };
       return response;
     }
@@ -141,7 +140,8 @@ export class QuestionService {
     } else {
       // Generate custom injected prompt.
       // Get the previous interaction to for the LLM to analyze.
-      const previousConvo: QuestionDto = conversation[currentQuestionIndex - 1];
+      const previousConvo: QuestionDto =
+        conversations[currentQuestionIndex - 1];
       const previousQuestion: string = previousConvo.originalQuestion;
       const previousAnswer: string = previousConvo.answer;
       const nextQuestion: string = currentQuestion.originalQuestion;
@@ -162,24 +162,21 @@ export class QuestionService {
     await this.storage.upload(bufferFile.audioContent as Buffer, path);
 
     const newQuestion: QuestionDto = {
-      _id: currentQuestion._id,
+      id: currentQuestion.id,
       originalQuestion: currentQuestion.originalQuestion,
       aiQuestion: generatedQuestion,
       answer: '',
       isAnswered: false,
+      interview: currentQuestion.interview,
     };
-    // Update current conversation/question
-    await this.update(
-      interviewDto,
-      { _id: currentQuestion._id.toString() },
-      newQuestion,
-    );
+    // Update current conversations/question
+    await this.update(interviewDto, { id: currentQuestion.id }, newQuestion);
 
     // Attach the generated question to the current question
     const newCurrentQuestion: GetQuestionDto = {
       aiQuestion: generatedQuestion,
       aiTtsSignedUrl: signedUrl,
-      _id: currentQuestion._id.toString(),
+      id: currentQuestion.id,
     };
     return newCurrentQuestion;
   }
@@ -192,12 +189,12 @@ export class QuestionService {
   ): Promise<QuestionDto[]> {
     // Use the find() method of interview service repository.
     const interview: InterviewDto = await this.interview.find(interviewId);
-    const conversation: QuestionDto[] = interview.conversation;
+    const conversations: QuestionDto[] = interview.conversations;
 
     // Modify the specific question or converstation
-    const updatedConversation: QuestionDto[] = conversation.map(
+    const updatedConversation: QuestionDto[] = conversations.map(
       (_question: QuestionDto) => {
-        if (_question._id.toString() == questionId._id.toString()) {
+        if (_question.id.toString() == questionId.id.toString()) {
           return question;
         }
         return _question;
@@ -205,10 +202,10 @@ export class QuestionService {
     );
 
     // Update the conversation in the database using interview repository
-    await this.interview.update<InterviewDto, '_id'>(
+    await this.interview.update<InterviewDto, 'id'>(
       interviewId,
-      { _id: new ObjectId(interviewId._id) },
-      { conversation: updatedConversation },
+      { id: interviewId.id },
+      { conversations: updatedConversation },
     );
 
     return updatedConversation;
@@ -222,26 +219,25 @@ export class QuestionService {
   ): Promise<GetQuestionDto | InterviewDto> {
     // Use the find method of interview service.
     const interview: InterviewDto = await this.interview.find(interviewDto);
-    const conversation: QuestionDto[] = interview.conversation;
+    const conversations: QuestionDto[] = interview.conversations;
 
     // Get the current unanswered question.
     const currentQuestion: QuestionDto | null =
-      conversation.find((convo: QuestionDto) => !convo.isAnswered) ?? null;
+      conversations.find((convo: QuestionDto) => !convo.isAnswered) ?? null;
 
     // Null check
     if (!currentQuestion) {
       throw new NotFoundException(
-        `No questions remaining for interview with ID ${interviewDto._id}.`,
+        `No questions remaining for interview with ID ${interviewDto.id}.`,
       );
     }
 
     // Get the index of the current question.
-    const currentQuestionIndex: number = conversation.findIndex(
-      (convo: QuestionDto) =>
-        convo._id.toString() === currentQuestion._id.toString(),
+    const currentQuestionIndex: number = conversations.findIndex(
+      (convo: QuestionDto) => convo.id === currentQuestion.id,
     );
 
-    const rawPath: string = `${interviewDto._id.toString()}/${currentQuestionIndex}`;
+    const rawPath: string = `${interviewDto.id}/${currentQuestionIndex}`;
     const videoPath: string = rawPath.concat('/video-answer.webm');
     const bucketName: string = 'recorded-temp';
 
@@ -258,15 +254,16 @@ export class QuestionService {
     }
 
     // Update fields the specific question or converstation
-    const updatedConversation: QuestionDto[] = conversation.map(
+    const updatedConversation: QuestionDto[] = conversations.map(
       (_question: QuestionDto) => {
-        if (_question._id.toString() == questionDto._id.toString()) {
+        if (_question.id == questionDto.id) {
           return {
-            _id: currentQuestion._id,
+            id: currentQuestion.id,
             originalQuestion: currentQuestion.originalQuestion,
             aiQuestion: currentQuestion.aiQuestion,
             answer: answerTranscription,
             isAnswered: true,
+            interview: currentQuestion.interview,
           };
         }
         return _question;
@@ -274,10 +271,10 @@ export class QuestionService {
     );
 
     // Update the conversation in the database using interview repository
-    await this.interview.update<InterviewDto, '_id'>(
+    await this.interview.update<InterviewDto, 'id'>(
       interviewDto,
-      { _id: new ObjectId(interviewDto._id) },
-      { conversation: updatedConversation },
+      { id: interviewDto.id },
+      { conversations: updatedConversation },
     );
 
     // Call and return the latest unanswered question
@@ -291,8 +288,8 @@ export class QuestionService {
     chunk: Express.Multer.File,
     isLastChunk: boolean,
   ): Promise<GetQuestionDto | InterviewDto | { isChunkStored: true }> {
-    const inteviewId: string = interviewDto._id.toString();
-    const questionId: string = questionDto._id.toString();
+    const inteviewId: string = interviewDto.id;
+    const questionId: string = questionDto.id;
     // Initialize map for this question if it doesn't exist
     if (!this.chunksMap.has(questionId)) {
       this.chunksMap.set(questionId, new Map<number, Buffer>());

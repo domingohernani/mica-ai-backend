@@ -1,7 +1,7 @@
 import z, { ZodType } from 'zod';
 
 export const getUserSchema: ZodType<{
-  _id: string;
+  id: string;
   sub: string;
   email: string;
   firstName: string;
@@ -11,7 +11,7 @@ export const getUserSchema: ZodType<{
   createdAt: Date;
   updatedAt: Date;
 }> = z.object({
-  _id: z.string().regex(/^[0-9a-fA-F]{24}$/, 'Invalid ObjectId'),
+  id: z.uuid(),
   sub: z.string(),
 
   email: z.email(),

@@ -6,10 +6,10 @@ export const createJobSchema: ZodType<{
   description: string;
   createdBy: string;
 }> = z.object({
-  organizationId: z.string().regex(/^[0-9a-fA-F]{24}$/, 'Invalid ObjectId'),
-  position: z.string(),
+  organizationId: z.uuid(),
+  position: z.string().min(1, 'Position is required').max(100),
   description: z.string(),
-  createdBy: z.string().regex(/^[0-9a-fA-F]{24}$/, 'Invalid ObjectId'),
+  createdBy: z.uuid(),
 });
 
 export type CreateJobDto = z.infer<typeof createJobSchema>;

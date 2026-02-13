@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { MongoRepository } from 'typeorm';
+import { Repository } from 'typeorm';
 
 import { GetUserDto } from '../common/schemas/get-user.schema';
 import now from '../utils/dates/now';
@@ -11,7 +11,7 @@ import { CreateUserDto } from './schemas/create-user.schema';
 export class UserService {
   // Inject the Interview repository to perform database operations
   constructor(
-    @InjectRepository(User) private readonly user: MongoRepository<User>,
+    @InjectRepository(User) private readonly user: Repository<User>,
   ) {}
 
   async create(userDto: CreateUserDto): Promise<User> {
@@ -42,12 +42,12 @@ export class UserService {
       where: { sub: sub },
     });
 
-    if (!user || !user._id) return null;
+    if (!user || !user.id) return null;
 
     // Create a user dto
     const userDto: GetUserDto = {
       ...user,
-      _id: user._id.toString(),
+      id: user.id.toString(),
     };
     return userDto;
   }

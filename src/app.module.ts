@@ -11,10 +11,12 @@ import { UserGuard } from './common/guards/user.guard';
 import { LlmModule } from './infrastructure/llm/llm.module';
 import { SpeechModule } from './infrastructure/speech/speech.module';
 import { StorageModule } from './infrastructure/storage/storage.module';
+import { Conversation } from './interview/entities/conversation.entity';
 import { Interview } from './interview/entities/interview.entity';
 import { InterviewModule } from './interview/interview.module';
 import { Job } from './job/entities/job.entity';
 import { JobModule } from './job/job.module';
+import { Member } from './organization/entities/member.entity';
 import { Organization } from './organization/entities/organization.entity';
 import { OrganizationModule } from './organization/organization.module';
 import { User } from './user/entities/user.entity';
@@ -23,10 +25,14 @@ import { UserModule } from './user/user.module';
 @Module({
   imports: [
     TypeOrmModule.forRoot({
-      type: 'mongodb',
-      url: process.env.MONGODB_URI,
+      type: 'postgres',
+      host: process.env.POSTGRES_HOST,
+      port: parseInt(process.env.POSTGRES_PORT!),
+      username: process.env.POSTGRES_USERNAME,
+      password: process.env.POSTGRES_PASSWORD,
+      database: process.env.POSTGRES_DATABASE,
       synchronize: true, // TODO: remove in production
-      entities: [Interview, User, Organization, Job],
+      entities: [Interview, User, Organization, Job, Conversation, Member],
     }),
     LlmModule,
     InterviewModule,

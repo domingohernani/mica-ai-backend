@@ -1,15 +1,15 @@
 import z, { ZodType } from 'zod';
 
 export const getOrganizationSchema: ZodType<{
-  _id: string;
+  id: string;
   name: string;
-  createdBy: object;
+  createdBy: string;
   createdAt: Date;
   updatedAt: Date;
 }> = z.object({
-  _id: z.string().regex(/^[0-9a-fA-F]{24}$/, 'Invalid ObjectId'),
+  id: z.uuid(),
   name: z.string(),
-  createdBy: z.object(),
+  createdBy: z.uuid(),
   createdAt: z.date(),
   updatedAt: z.date(),
 });

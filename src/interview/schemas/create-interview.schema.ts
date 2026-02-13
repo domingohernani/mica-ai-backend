@@ -2,8 +2,8 @@ import z from 'zod';
 import { ZodType } from 'zod';
 
 export const createInterviewSchema: ZodType<{
-  conversation: {
-    _id?: string;
+  conversations: {
+    id?: string;
     originalQuestion: string;
     aiQuestion: string | null;
     answer: string | null;
@@ -11,9 +11,9 @@ export const createInterviewSchema: ZodType<{
   }[];
   isDone: boolean;
 }> = z.object({
-  conversation: z.array(
+  conversations: z.array(
     z.object({
-      _id: z
+      id: z
         .string()
         .regex(/^[0-9a-fA-F]{24}$/, 'Invalid ObjectId')
         .optional(),

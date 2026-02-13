@@ -1,9 +1,10 @@
-import { ObjectId } from 'mongodb';
+import { Interview } from '../entities/interview.entity';
 
 export class QuestionDto {
-  _id: ObjectId;
+  id: string;
   originalQuestion: string;
   aiQuestion: string;
   answer: string;
   isAnswered: boolean;
+  interview: Interview;
 }

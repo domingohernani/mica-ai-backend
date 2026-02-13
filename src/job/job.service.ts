@@ -1,7 +1,6 @@
-import { Body, Injectable, Param, Patch, UsePipes } from '@nestjs/common';
+import { Body, Injectable, Param } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { ObjectId } from 'mongodb';
-import { MongoRepository } from 'typeorm';
+import { Repository } from 'typeorm';
 
 import { ZodValidationPipe } from '../common/pipes/zod-validation.pipe';
 import {
@@ -22,7 +21,7 @@ export class JobService {
   // Inject the Job repository to perform database operations
   constructor(
     @InjectRepository(Job)
-    private readonly job: MongoRepository<Job>,
+    private readonly job: Repository<Job>,
   ) {}
 
   // Create Job
@@ -34,8 +33,6 @@ export class JobService {
     const newJobDto: Job = {
       ...jobDto,
       status: Status.Open,
-      organizationId: new ObjectId(jobDto.organizationId),
-      createdBy: new ObjectId(jobDto.createdBy),
       createdAt: now(),
       updatedAt: now(),
     };

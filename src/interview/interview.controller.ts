@@ -11,7 +11,7 @@ import { createInterviewSchema } from './schemas/create-interview.schema';
 export class InterviewController {
   constructor(private readonly interviewService: InterviewService) {}
 
-  @Get(':_id')
+  @Get(':id')
   @UsePipes(new ZodValidationPipe(getParamSchema))
   async find(@Param() interviewDto: GetParamDto): Promise<InterviewDto> {
     return await this.interviewService.find(interviewDto);

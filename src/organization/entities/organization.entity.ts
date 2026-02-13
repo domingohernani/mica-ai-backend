@@ -1,24 +1,26 @@
-import { Column, Entity, ObjectId, ObjectIdColumn } from 'typeorm';
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+
+import { Member } from './member.entity';
 
 @Entity()
 export class Organization {
-  @ObjectIdColumn()
-  _id?: ObjectId;
+  @PrimaryGeneratedColumn()
+  id?: string;
 
   @Column()
   name: string;
-  @Column()
-  // members: Member[];
-  members: {
-    userId: ObjectId;
-    role: string;
-    joinedAt: Date;
-  }[];
 
-  @Column({ type: 'string' })
-  createdBy: ObjectId;
-  @Column()
+  @OneToMany(() => Member, (member: Member) => member.organization, {
+    cascade: true,
+  })
+  members: Member[];
+
+  @Column('uuid')
+  createdBy: string;
+
+  @Column({ type: 'timestamp' })
   createdAt: Date;
-  @Column()
+
+  @Column({ type: 'timestamp' })
   updatedAt: Date;
 }

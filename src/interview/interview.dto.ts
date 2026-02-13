@@ -1,14 +1,8 @@
-import { ObjectId } from 'mongodb';
+import { Conversation } from './entities/conversation.entity';
 
 export class InterviewDto {
-  readonly _id: ObjectId;
-  readonly conversation: {
-    _id: ObjectId;
-    originalQuestion: string;
-    aiQuestion: string;
-    answer: string;
-    isAnswered: boolean;
-  }[];
+  readonly id: string;
+  readonly conversations: Conversation[];
   readonly isDone: boolean;
   readonly finalMessage: string;
   readonly finalTtsSignedUrl?: string;
