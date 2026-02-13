@@ -19,6 +19,6 @@ export class Conversation {
   @Column({ default: false })
   isAnswered: boolean;
 
-  @ManyToOne(() => Interview, (interview) => interview.conversations)
+  @ManyToOne(() => Interview, (interview: Interview) => interview.conversations)
   interview: Interview;
 }

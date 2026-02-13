@@ -4,7 +4,7 @@ import { Conversation } from './conversation.entity';
 
 @Entity()
 export class Interview {
-  @PrimaryGeneratedColumn()
+  @PrimaryGeneratedColumn('uuid')
   id: string;
 
   @Column({ default: false })

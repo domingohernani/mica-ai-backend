@@ -4,7 +4,7 @@ import { Member } from './member.entity';
 
 @Entity()
 export class Organization {
-  @PrimaryGeneratedColumn()
+  @PrimaryGeneratedColumn('uuid')
   id?: string;
 
   @Column()
