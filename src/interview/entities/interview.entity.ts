@@ -17,6 +17,10 @@ export class Interview {
   @OneToMany(
     () => Conversation,
     (conversations: Conversation) => conversations.interview,
+    {
+      cascade: true, // This automatically saves conversations
+      eager: true, // Automatically loads conversations
+    },
   )
   conversations: Conversation[];
 }

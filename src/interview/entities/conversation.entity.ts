@@ -1,4 +1,10 @@
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  Entity,
+  JoinColumn,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 
 import { Interview } from './interview.entity';
 
@@ -10,15 +16,20 @@ export class Conversation {
   @Column()
   originalQuestion: string;
 
-  @Column()
-  aiQuestion: string;
+  @Column('text', { nullable: true })
+  aiQuestion: string | null;
 
-  @Column('text')
-  answer: string;
+  @Column('text', { nullable: true })
+  answer: string | null;
 
   @Column({ default: false })
   isAnswered: boolean;
 
+  // This represent the interviewId
   @ManyToOne(() => Interview, (interview: Interview) => interview.conversations)
-  interview: Interview;
+  @JoinColumn({ name: 'interviewId' })
+  interview?: Interview;
+
+  @Column('uuid')
+  interviewId: string;
 }

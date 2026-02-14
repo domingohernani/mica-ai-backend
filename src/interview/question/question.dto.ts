@@ -1,10 +1,8 @@
-import { Interview } from '../entities/interview.entity';
-
 export class QuestionDto {
-  id: string;
+  id: string | null;
   originalQuestion: string;
-  aiQuestion: string;
-  answer: string;
+  aiQuestion: string | null;
+  answer: string | null;
   isAnswered: boolean;
-  interview: Interview;
+  interviewId: string;
 }

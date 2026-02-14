@@ -1,6 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { ObjectId } from 'mongodb';
 import { StorageService } from 'src/infrastructure/storage/storage.service';
 import { Repository } from 'typeorm';
 

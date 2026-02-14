@@ -14,6 +14,7 @@ import {
   generateLastResponse,
   generateQuestion,
 } from '../../utils/generate-prompt';
+import { Conversation } from '../entities/conversation.entity';
 import { InterviewDto } from '../interview.dto';
 import { GetParamDto } from './../../common/schemas/get-param.schema';
 import { InterviewService } from './../interview.service';
@@ -62,10 +63,10 @@ export class QuestionService {
       const previousConvo: QuestionDto =
         conversations[conversations.length - 1];
       const previousQuestion: string = previousConvo.originalQuestion;
-      const previousAnswer: string = previousConvo.answer;
+      const previousAnswer: string | null = previousConvo.answer;
       const prompt: string = generateLastResponse(
         previousQuestion,
-        previousAnswer,
+        previousAnswer!,
       );
       llmDto.prompt = prompt;
       // Call LLM to generate question to end the interview
@@ -104,7 +105,7 @@ export class QuestionService {
       conversations.find((convo: QuestionDto) => !convo.isAnswered) ?? null;
 
     // Null check
-    if (!currentQuestion) {
+    if (!currentQuestion || !currentQuestion.id) {
       throw new NotFoundException(
         `No questions remaining for interview with ID ${interviewDto.id}.`,
       );
@@ -143,12 +144,12 @@ export class QuestionService {
       const previousConvo: QuestionDto =
         conversations[currentQuestionIndex - 1];
       const previousQuestion: string = previousConvo.originalQuestion;
-      const previousAnswer: string = previousConvo.answer;
+      const previousAnswer: string | null = previousConvo.answer;
       const nextQuestion: string = currentQuestion.originalQuestion;
 
       const prompt: string = generateQuestion(
         previousQuestion,
-        previousAnswer,
+        previousAnswer!,
         nextQuestion,
       );
       llmDto.prompt = prompt;
@@ -167,7 +168,7 @@ export class QuestionService {
       aiQuestion: generatedQuestion,
       answer: '',
       isAnswered: false,
-      interview: currentQuestion.interview,
+      interviewId: currentQuestion.interviewId,
     };
     // Update current conversations/question
     await this.update(interviewDto, { id: currentQuestion.id }, newQuestion);
@@ -194,6 +195,8 @@ export class QuestionService {
     // Modify the specific question or converstation
     const updatedConversation: QuestionDto[] = conversations.map(
       (_question: QuestionDto) => {
+        if (!_question.id) return _question;
+
         if (_question.id.toString() == questionId.id.toString()) {
           return question;
         }
@@ -205,7 +208,11 @@ export class QuestionService {
     await this.interview.update<InterviewDto, 'id'>(
       interviewId,
       { id: interviewId.id },
-      { conversations: updatedConversation },
+      {
+        conversations: updatedConversation.filter(
+          (q: Conversation): q is Conversation => q.id !== null,
+        ),
+      },
     );
 
     return updatedConversation;
@@ -263,7 +270,7 @@ export class QuestionService {
             aiQuestion: currentQuestion.aiQuestion,
             answer: answerTranscription,
             isAnswered: true,
-            interview: currentQuestion.interview,
+            interviewId: currentQuestion.interviewId,
           };
         }
         return _question;
@@ -274,7 +281,11 @@ export class QuestionService {
     await this.interview.update<InterviewDto, 'id'>(
       interviewDto,
       { id: interviewDto.id },
-      { conversations: updatedConversation },
+      {
+        conversations: updatedConversation.filter(
+          (q: Conversation): q is Conversation => q.id !== null,
+        ),
+      },
     );
 
     // Call and return the latest unanswered question
