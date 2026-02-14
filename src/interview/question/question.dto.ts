@@ -1,6 +1,7 @@
 export class QuestionDto {
-  id: string | null;
+  id: string;
   originalQuestion: string;
+  order: number;
   aiQuestion: string | null;
   answer: string | null;
   isAnswered: boolean;

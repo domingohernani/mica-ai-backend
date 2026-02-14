@@ -4,6 +4,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { LlmModule } from '../../infrastructure/llm/llm.module';
 import { SpeechModule } from '../../infrastructure/speech/speech.module';
 import { StorageModule } from '../../infrastructure/storage/storage.module';
+import { Conversation } from '../entities/conversation.entity';
 import { Interview } from '../entities/interview.entity';
 import { InterviewModule } from '../interview.module';
 import { QuestionController } from './question.controller';
@@ -13,7 +14,7 @@ import { QuestionService } from './question.service';
   controllers: [QuestionController],
   providers: [QuestionService],
   imports: [
-    TypeOrmModule.forFeature([Interview]),
+    TypeOrmModule.forFeature([Interview, Conversation]),
     forwardRef(() => InterviewModule),
     LlmModule,
     SpeechModule,

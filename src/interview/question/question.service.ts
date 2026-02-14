@@ -3,6 +3,8 @@ import {
   InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 
 import { SynthesizeResponse } from '../../common/types/tts.type';
 import { LlmService } from '../../infrastructure/llm/llm.service';
@@ -28,6 +30,9 @@ export class QuestionService {
 
   // Inject the Interview repository to perform database operations
   constructor(
+    @InjectRepository(Conversation)
+    private readonly conversation: Repository<Conversation>,
+
     private interview: InterviewService,
     private llm: LlmService,
     private speech: SpeechService,
@@ -38,9 +43,13 @@ export class QuestionService {
   async find(
     interviewDto: GetParamDto,
   ): Promise<GetQuestionDto | InterviewDto> {
-    // Use the find method of interview service.
-    const interview: InterviewDto = await this.interview.find(interviewDto);
-    const conversations: QuestionDto[] = interview.conversations;
+    // Find all questions or conversations in ascending order
+    const conversations: QuestionDto[] = await this.conversation.find({
+      where: { interviewId: interviewDto.id },
+      order: {
+        order: 'ASC',
+      },
+    });
 
     // Check if all questions are already answered.
     const isAllAnswered: boolean = conversations.every(
@@ -56,6 +65,7 @@ export class QuestionService {
 
     // Case where all questions are alread answered.
     if (isAllAnswered) {
+      const interview: InterviewDto = await this.interview.find(interviewDto);
       // Eearly return do not recompute
       if (interview.isDone) return interview;
 
@@ -81,8 +91,11 @@ export class QuestionService {
         await this.speech.synthesize(generatedQuestion);
       await this.storage.upload(bufferFile.audioContent as Buffer, path);
 
-      // Update isDone and finalMessage field.
-      await this.interview.update<InterviewDto, 'id'>(
+      // Update isDone and finalMessage field and return the updated interview
+      const newInterview: InterviewDto = await this.interview.update<
+        InterviewDto,
+        'id'
+      >(
         interviewDto,
         { id: interviewDto.id },
         {
@@ -91,12 +104,10 @@ export class QuestionService {
         },
       );
 
-      const newInterview: InterviewDto = {
-        ...interview,
+      return {
+        ...newInterview,
         finalTtsSignedUrl: signedUrl,
       };
-
-      return newInterview;
     }
 
     // Get the current unanswered question. If undefined, it returns null, meaning
@@ -165,13 +176,15 @@ export class QuestionService {
     const newQuestion: QuestionDto = {
       id: currentQuestion.id,
       originalQuestion: currentQuestion.originalQuestion,
+      order: currentQuestion.order,
       aiQuestion: generatedQuestion,
       answer: '',
       isAnswered: false,
       interviewId: currentQuestion.interviewId,
     };
-    // Update current conversations/question
-    await this.update(interviewDto, { id: currentQuestion.id }, newQuestion);
+
+    // Update current conversations/question using the repository
+    await this.conversation.update(currentQuestion.id, newQuestion);
 
     // Attach the generated question to the current question
     const newCurrentQuestion: GetQuestionDto = {
@@ -182,69 +195,25 @@ export class QuestionService {
     return newCurrentQuestion;
   }
 
-  // Update interview question
-  async update(
-    interviewId: GetParamDto,
-    questionId: GetParamDto,
-    question: QuestionDto,
-  ): Promise<QuestionDto[]> {
-    // Use the find() method of interview service repository.
-    const interview: InterviewDto = await this.interview.find(interviewId);
-    const conversations: QuestionDto[] = interview.conversations;
-
-    // Modify the specific question or converstation
-    const updatedConversation: QuestionDto[] = conversations.map(
-      (_question: QuestionDto) => {
-        if (!_question.id) return _question;
-
-        if (_question.id.toString() == questionId.id.toString()) {
-          return question;
-        }
-        return _question;
-      },
-    );
-
-    // Update the conversation in the database using interview repository
-    await this.interview.update<InterviewDto, 'id'>(
-      interviewId,
-      { id: interviewId.id },
-      {
-        conversations: updatedConversation.filter(
-          (q: Conversation): q is Conversation => q.id !== null,
-        ),
-      },
-    );
-
-    return updatedConversation;
-  }
-
   // Handle files, transcribe audio, store them in GCS, mark question answered (more specific operation)
   async updateAndTransribe(
     interviewDto: GetParamDto,
     questionDto: GetParamDto,
     videoBuffer: Buffer,
   ): Promise<GetQuestionDto | InterviewDto> {
-    // Use the find method of interview service.
-    const interview: InterviewDto = await this.interview.find(interviewDto);
-    const conversations: QuestionDto[] = interview.conversations;
-
     // Get the current unanswered question.
     const currentQuestion: QuestionDto | null =
-      conversations.find((convo: QuestionDto) => !convo.isAnswered) ?? null;
+      await this.conversation.findOneBy({
+        id: questionDto.id,
+      });
 
-    // Null check
     if (!currentQuestion) {
       throw new NotFoundException(
         `No questions remaining for interview with ID ${interviewDto.id}.`,
       );
     }
 
-    // Get the index of the current question.
-    const currentQuestionIndex: number = conversations.findIndex(
-      (convo: QuestionDto) => convo.id === currentQuestion.id,
-    );
-
-    const rawPath: string = `${interviewDto.id}/${currentQuestionIndex}`;
+    const rawPath: string = `${interviewDto.id}/${currentQuestion.order}`;
     const videoPath: string = rawPath.concat('/video-answer.webm');
     const bucketName: string = 'recorded-temp';
 
@@ -260,33 +229,11 @@ export class QuestionService {
       throw new InternalServerErrorException('Video transcription failed.');
     }
 
-    // Update fields the specific question or converstation
-    const updatedConversation: QuestionDto[] = conversations.map(
-      (_question: QuestionDto) => {
-        if (_question.id == questionDto.id) {
-          return {
-            id: currentQuestion.id,
-            originalQuestion: currentQuestion.originalQuestion,
-            aiQuestion: currentQuestion.aiQuestion,
-            answer: answerTranscription,
-            isAnswered: true,
-            interviewId: currentQuestion.interviewId,
-          };
-        }
-        return _question;
-      },
-    );
-
-    // Update the conversation in the database using interview repository
-    await this.interview.update<InterviewDto, 'id'>(
-      interviewDto,
-      { id: interviewDto.id },
-      {
-        conversations: updatedConversation.filter(
-          (q: Conversation): q is Conversation => q.id !== null,
-        ),
-      },
-    );
+    // Update the conversation in the database using conversation repository
+    await this.conversation.update(currentQuestion.id, {
+      answer: answerTranscription,
+      isAnswered: true,
+    });
 
     // Call and return the latest unanswered question
     return await this.find(interviewDto);

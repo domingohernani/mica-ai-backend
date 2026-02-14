@@ -16,6 +16,9 @@ export class Conversation {
   @Column()
   originalQuestion: string;
 
+  @Column()
+  order: number;
+
   @Column('text', { nullable: true })
   aiQuestion: string | null;
 

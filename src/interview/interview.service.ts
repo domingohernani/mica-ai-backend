@@ -45,6 +45,13 @@ export class InterviewService {
 
   // Create an interview document
   async create(interviewDto: InterviewDto): Promise<Interview> {
+    // Creating ordered question
+    const orderedConversation: QuestionDto[] = interviewDto.conversations.map(
+      (convo: QuestionDto, index: number) => ({ ...convo, order: index }),
+    );
+
+    interviewDto.conversations = orderedConversation;
+
     const newInterview: Interview = this.interview.create(interviewDto);
     // Saves into the database
     return await this.interview.save(newInterview);
