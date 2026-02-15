@@ -1,24 +1,31 @@
-import { Column, Entity, ObjectId, ObjectIdColumn } from 'typeorm';
+import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity()
 export class User {
-  @ObjectIdColumn()
-  _id?: ObjectId;
+  @PrimaryGeneratedColumn('uuid')
+  id?: string;
+
   @Column()
   sub: string;
 
   @Column()
   email: string;
+
   @Column()
   firstName: string;
+
   @Column()
   lastName: string;
+
   @Column()
   profileUrl: string;
+
   @Column()
   isVerified: boolean;
-  @Column()
+
+  @Column({ type: 'timestamp' })
   createdAt: Date;
-  @Column()
+
+  @Column({ type: 'timestamp' })
   updatedAt: Date;
 }

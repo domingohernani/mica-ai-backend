@@ -22,11 +22,11 @@ export class OrganizationController {
     organizationDto: CreateOrganizationDto,
     @User() user: GetUserDto,
   ): Promise<Organization> {
-    return await this.organizationService.create(user._id, organizationDto);
+    return await this.organizationService.create(user.id, organizationDto);
   }
 
   // Get the organizations of the user
-  @Get('user/:_id')
+  @Get('user/:id')
   @UsePipes(new ZodValidationPipe(getParamSchema))
   async findByUserId(
     @Param() organizationDto: GetParamDto,

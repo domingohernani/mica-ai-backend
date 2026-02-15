@@ -1,4 +1,5 @@
 import { Body, Controller, Get, Param, Post, UsePipes } from '@nestjs/common';
+import { Public } from 'src/common/decorators/public.decorator';
 import { ZodValidationPipe } from 'src/common/pipes/zod-validation.pipe';
 
 import type { GetParamDto } from '../common/schemas/get-param.schema';
@@ -11,12 +12,15 @@ import { createInterviewSchema } from './schemas/create-interview.schema';
 export class InterviewController {
   constructor(private readonly interviewService: InterviewService) {}
 
-  @Get(':_id')
+  @Public()
+  @Get(':id')
   @UsePipes(new ZodValidationPipe(getParamSchema))
   async find(@Param() interviewDto: GetParamDto): Promise<InterviewDto> {
     return await this.interviewService.find(interviewDto);
   }
 
+  // TODO: remove public
+  @Public()
   @Post()
   @UsePipes(new ZodValidationPipe(createInterviewSchema))
   async create(@Body() interviewDto: InterviewDto): Promise<InterviewDto> {

@@ -1,27 +1,11 @@
-import { ObjectId as MongoObjectId } from 'mongodb';
-import {
-  BeforeInsert,
-  Column,
-  Entity,
-  ObjectId,
-  ObjectIdColumn,
-} from 'typeorm';
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 
-import { QuestionDto } from '../question/question.dto';
+import { Conversation } from './conversation.entity';
 
 @Entity()
 export class Interview {
-  @ObjectIdColumn()
-  _id: ObjectId;
-
-  @Column()
-  conversation: {
-    _id: ObjectId;
-    originalQuestion: string;
-    aiQuestion: string;
-    answer: string;
-    isAnswered: boolean;
-  }[];
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
 
   @Column({ default: false })
   isDone: boolean;
@@ -29,13 +13,14 @@ export class Interview {
   @Column({ default: '' })
   finalMessage: string;
 
-  @BeforeInsert()
-  generateConversation(): void {
-    if (this.conversation) {
-      this.conversation = this.conversation.map((convo: QuestionDto) => ({
-        ...convo,
-        _id: convo._id || new MongoObjectId(),
-      }));
-    }
-  }
+  // Reference to Conversation entity
+  @OneToMany(
+    () => Conversation,
+    (conversations: Conversation) => conversations.interview,
+    {
+      cascade: true, // This automatically saves conversations
+      eager: true, // Automatically loads conversations
+    },
+  )
+  conversations: Conversation[];
 }

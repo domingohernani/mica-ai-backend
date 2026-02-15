@@ -1,11 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { ObjectId } from 'mongodb';
 import { GetParamDto } from 'src/common/schemas/get-param.schema';
-import { MongoRepository } from 'typeorm';
+import { Repository } from 'typeorm';
 
 import { Roles } from '../constants/roles';
 import now from '../utils/dates/now';
+import { Member } from './entities/member.entity';
 import { Organization } from './entities/organization.entity';
 import { CreateOrganizationDto } from './schemas/create-organization.schema';
 import { GetOrganizationDto } from './schemas/get-organization.schema';
@@ -15,48 +15,63 @@ export class OrganizationService {
   // Inject the Interview repository to perform database operations
   constructor(
     @InjectRepository(Organization)
-    private readonly organization: MongoRepository<Organization>,
+    private readonly organization: Repository<Organization>,
+    @InjectRepository(Member)
+    private readonly member: Repository<Member>,
   ) {}
 
-  // Create organization
+  // Create organization and create a member
   async create(
     userId: string,
     organizationDto: CreateOrganizationDto,
   ): Promise<Organization> {
-    // Adding and modifying necessary properties
-    const newOrganizationDto: Organization = {
+    // reate the organization entity without members
+    const newOrganization: Organization = this.organization.create({
       ...organizationDto,
-      members: [
-        {
-          userId: new ObjectId(userId),
-          role: Roles.Owner, // The one created the organization will be the Owner
-          joinedAt: now(),
-        },
-      ],
-      createdBy: new ObjectId(userId),
+      createdBy: userId,
       createdAt: now(),
       updatedAt: now(),
-    };
+    });
 
-    const newOrg: Organization = this.organization.create(newOrganizationDto);
-    // Return and save into the database
-    return await this.organization.save(newOrg);
+    // Save the organization first to generate its ID
+    const savedOrg: Organization =
+      await this.organization.save(newOrganization);
+
+    // Create the owner member
+    const ownerMember: Member = this.member.create({
+      organization: savedOrg, // link via foreign key
+      userId,
+      role: Roles.Owner,
+      joinedAt: now(),
+    });
+
+    // Save the member
+    await this.member.save(ownerMember);
+
+    // 5Attach members array for returning
+    savedOrg.members = [ownerMember];
+
+    return savedOrg;
   }
 
   // Get organizations base on user id
   async findByUserId(
     organizationDto: GetParamDto,
   ): Promise<GetOrganizationDto[]> {
-    const id: ObjectId = new ObjectId(organizationDto._id);
-    const organizations: Organization[] = await this.organization.find({
-      where: { 'members.userId': id },
-    });
+    const id: string = organizationDto.id;
+    // Find all organizations where the given user is a member
+    // This performs an INNER JOIN with the Member table and filters by userId
+    const organizations: Organization[] = await this.organization
+      .createQueryBuilder('org')
+      .innerJoinAndSelect('org.members', 'member')
+      .where('member.userId = :id', { id })
+      .getMany();
 
-    // Convert the _id to string
+    // Convert the id to string
     const convertedOrganizations: GetOrganizationDto[] = organizations.map(
       (organization: Organization) => ({
         ...organization,
-        _id: organization._id?.toString() || '',
+        id: organization.id || '',
       }),
     );
 

@@ -29,7 +29,7 @@ export class JobController {
   }
 
   @Public()
-  @Patch(':_id')
+  @Patch(':id')
   update(
     @Param(new ZodValidationPipe(getParamSchema)) jobId: GetParamDto,
     @Body(new ZodValidationPipe(updateJobSchema)) jobBody: UpdateJobDto,

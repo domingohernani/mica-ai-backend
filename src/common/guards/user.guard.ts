@@ -42,7 +42,7 @@ export class UserGuard implements CanActivate {
     );
 
     // Skip if the no registered user
-    if (!appUser || !appUser._id) return true;
+    if (!appUser || !appUser.id) return true;
 
     // TODO: include a role at appUser, probably use the organization and check the member array
     request['appUser'] = appUser;

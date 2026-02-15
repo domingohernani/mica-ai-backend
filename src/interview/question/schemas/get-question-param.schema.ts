@@ -1,11 +1,11 @@
 import z, { ZodType } from 'zod';
 
 export const getQuestionParamSchema: ZodType<{
-  _id: string;
+  id: string;
   questionId: string;
 }> = z.object({
-  _id: z.string().regex(/^[0-9a-fA-F]{24}$/, 'Invalid ObjectId'),
-  questionId: z.string().regex(/^[0-9a-fA-F]{24}$/, 'Invalid ObjectId'),
+  id: z.uuid(),
+  questionId: z.uuid(),
 });
 
 export type GetQuestionParamDto = z.infer<typeof getQuestionParamSchema>;

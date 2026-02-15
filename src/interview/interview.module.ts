@@ -2,6 +2,7 @@ import { forwardRef, Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
 import { StorageModule } from '../infrastructure/storage/storage.module';
+import { Conversation } from './entities/conversation.entity';
 import { Interview } from './entities/interview.entity';
 import { InterviewController } from './interview.controller';
 import { InterviewService } from './interview.service';
@@ -12,7 +13,7 @@ import { QuestionModule } from './question/question.module';
   providers: [InterviewService],
   exports: [InterviewService],
   imports: [
-    TypeOrmModule.forFeature([Interview]),
+    TypeOrmModule.forFeature([Interview, Conversation]),
     forwardRef(() => QuestionModule),
     StorageModule,
   ],

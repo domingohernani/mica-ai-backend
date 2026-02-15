@@ -16,7 +16,7 @@ export const User: ReturnType<typeof createParamDecorator> =
 
     // Ensure user properties are valid
     if (
-      !userReq?._id ||
+      !userReq?.id ||
       !userReq.email ||
       !userReq.firstName ||
       !userReq.lastName
@@ -25,7 +25,7 @@ export const User: ReturnType<typeof createParamDecorator> =
 
     // Create a user
     const user: GetUserDto = {
-      _id: userReq['_id'].toString(),
+      id: userReq['id'],
       sub: userReq['sub'],
       email: userReq['email'],
       firstName: userReq['firstName'],

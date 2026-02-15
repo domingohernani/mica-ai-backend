@@ -1,8 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { ObjectId } from 'mongodb';
 import { StorageService } from 'src/infrastructure/storage/storage.service';
-import { MongoRepository } from 'typeorm';
+import { Repository } from 'typeorm';
 
 import { GetParamDto } from '../common/schemas/get-param.schema';
 import { Interview } from './entities/interview.entity';
@@ -13,15 +12,15 @@ import { QuestionDto } from './question/question.dto';
 export class InterviewService {
   // Inject the Interview repository to perform database operations
   constructor(
-    @InjectRepository(Interview) private interview: MongoRepository<Interview>,
+    @InjectRepository(Interview) private interview: Repository<Interview>,
     private storage: StorageService,
   ) {}
 
   // Find the right interview using interview ID
   async find(interviewDto: GetParamDto): Promise<InterviewDto> {
-    const id: ObjectId = new ObjectId(interviewDto._id);
+    const id: string = interviewDto.id;
     const interview: Interview | null = await this.interview.findOne({
-      where: { _id: id },
+      where: { id: id },
     });
 
     // Checking if the interview is found. Throws an erorr if not found
@@ -30,10 +29,10 @@ export class InterviewService {
         `Interview with ID ${id.toString()} not found`,
       );
     }
-    const conversation: QuestionDto[] = interview.conversation;
+    const conversations: QuestionDto[] = interview.conversations;
 
     // Get the Text-to-Speech signed url
-    const path: string = `${interviewDto._id.toString()}/${conversation.length}/message.mp3`;
+    const path: string = `${interviewDto.id}/${conversations.length}/message.mp3`;
     const signedUrl: string = await this.storage.sign(path);
 
     const convertedInterview: InterviewDto = {
@@ -46,6 +45,13 @@ export class InterviewService {
 
   // Create an interview document
   async create(interviewDto: InterviewDto): Promise<Interview> {
+    // Creating ordered question
+    const orderedConversation: QuestionDto[] = interviewDto.conversations.map(
+      (convo: QuestionDto, index: number) => ({ ...convo, order: index }),
+    );
+
+    interviewDto.conversations = orderedConversation;
+
     const newInterview: Interview = this.interview.create(interviewDto);
     // Saves into the database
     return await this.interview.save(newInterview);

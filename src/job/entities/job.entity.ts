@@ -1,22 +1,28 @@
-import { Column, Entity, ObjectId, ObjectIdColumn } from 'typeorm';
+import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity()
 export class Job {
-  @ObjectIdColumn()
-  _id?: ObjectId;
+  @PrimaryGeneratedColumn('uuid')
+  id?: string;
 
-  @Column({ type: 'string' })
-  organizationId: ObjectId;
+  @Column('uuid')
+  organizationId: string;
+
   @Column()
   position: string;
-  @Column()
+
+  @Column('text')
   description: string;
+
   @Column()
   status: string;
-  @Column({ type: 'string' })
-  createdBy: ObjectId;
-  @Column()
+
+  @Column('uuid')
+  createdBy: string;
+
+  @Column({ type: 'timestamp' })
   createdAt: Date;
-  @Column()
+
+  @Column({ type: 'timestamp' })
   updatedAt: Date;
 }

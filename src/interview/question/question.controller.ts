@@ -21,7 +21,7 @@ import { getQuestionParamSchema } from './schemas/get-question-param.schema';
 
 // TODO: modularize
 
-@Controller('interviews/:_id')
+@Controller('interviews/:id')
 export class QuestionController {
   constructor(private readonly questionService: QuestionService) {}
 
@@ -36,16 +36,16 @@ export class QuestionController {
   @Patch('questions/:questionId')
   @UseInterceptors(FileInterceptor('video'))
   async update(
-    @Param('_id') _id: string,
+    @Param('id') id: string,
     @Param('questionId') questionId: string,
     @UploadedFile() videoBuffer: Buffer,
   ): Promise<GetQuestionDto | InterviewDto> {
-    const params: GetQuestionParamDto = { _id, questionId };
+    const params: GetQuestionParamDto = { id, questionId };
     const validated: GetQuestionParamDto = getQuestionParamSchema.parse(params);
 
     return await this.questionService.updateAndTransribe(
-      { _id: validated._id },
-      { _id: validated.questionId },
+      { id: validated.id },
+      { id: validated.questionId },
       videoBuffer,
     );
   }
@@ -53,12 +53,12 @@ export class QuestionController {
   @Post('questions/:questionId/chunk')
   @UseInterceptors(FileInterceptor('chunk'))
   async updateChunk(
-    @Param('_id') _id: string,
+    @Param('id') id: string,
     @Param('questionId') questionId: string,
     @UploadedFile() chunk: Express.Multer.File,
     @Body() body: { chunkNumber: string; isLastChunk: string },
   ): Promise<GetQuestionDto | InterviewDto | { isChunkStored: true }> {
-    const params: GetQuestionParamDto = { _id, questionId };
+    const params: GetQuestionParamDto = { id, questionId };
     const validated: GetQuestionParamDto = getQuestionParamSchema.parse(params);
 
     // Type conversion
@@ -66,8 +66,8 @@ export class QuestionController {
     const parsedIsLastChunk: boolean = body.isLastChunk === 'true';
 
     return await this.questionService.updateByChunk(
-      { _id: validated._id },
-      { _id: validated.questionId },
+      { id: validated.id },
+      { id: validated.questionId },
       parsedChunkNumber,
       chunk,
       parsedIsLastChunk,

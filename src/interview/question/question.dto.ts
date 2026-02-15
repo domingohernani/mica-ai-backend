@@ -1,9 +1,9 @@
-import { ObjectId } from 'mongodb';
-
 export class QuestionDto {
-  _id: ObjectId;
+  id: string;
   originalQuestion: string;
-  aiQuestion: string;
-  answer: string;
+  order: number;
+  aiQuestion: string | null;
+  answer: string | null;
   isAnswered: boolean;
+  interviewId: string;
 }
