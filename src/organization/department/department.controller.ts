@@ -1,4 +1,4 @@
-import { Body, Controller, Param, Post } from '@nestjs/common';
+import { Body, Controller, Param, Patch, Post } from '@nestjs/common';
 import { Public } from 'src/common/decorators/public.decorator';
 
 import { ZodValidationPipe } from '../../common/pipes/zod-validation.pipe';
@@ -11,6 +11,14 @@ import {
   type CreateDepartmentDto,
   createDepartmentSchema,
 } from './schemas/create-department.schema';
+import {
+  type DepartmentParamDto,
+  departmentParamSchema,
+} from './schemas/department-param.schema';
+import {
+  type UpdateDepartmentDto,
+  updateDepartmentSchema,
+} from './schemas/update-department.schema';
 
 @Controller('organizations/:id')
 export class DepartmentController {
@@ -25,5 +33,16 @@ export class DepartmentController {
     departmentDto: CreateDepartmentDto,
   ): Promise<CreateDepartmentDto> {
     return await this.departmentService.create(organizationId, departmentDto);
+  }
+
+  @Public()
+  @Patch('departments/:departmentId')
+  async update(
+    @Param(new ZodValidationPipe(departmentParamSchema)) // ← No parameter name
+    params: DepartmentParamDto, // ← Gets all params as object
+    @Body(new ZodValidationPipe(updateDepartmentSchema))
+    departmentDto: UpdateDepartmentDto,
+  ): Promise<UpdateDepartmentDto> {
+    return await this.departmentService.update(params, departmentDto);
   }
 }
