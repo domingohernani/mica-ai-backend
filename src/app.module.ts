@@ -4,7 +4,6 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { AuthController } from './auth/auth.controller';
 import { AuthModule } from './auth/auth.module';
 import { JwtGuard } from './auth/guards/jwt.guard';
 import { UserGuard } from './common/guards/user.guard';
@@ -16,6 +15,8 @@ import { Interview } from './interview/entities/interview.entity';
 import { InterviewModule } from './interview/interview.module';
 import { Job } from './job/entities/job.entity';
 import { JobModule } from './job/job.module';
+import { DepartmentModule } from './organization/department/department.module';
+import { Department } from './organization/department/entities/department.entity';
 import { Member } from './organization/entities/member.entity';
 import { Organization } from './organization/entities/organization.entity';
 import { OrganizationModule } from './organization/organization.module';
@@ -32,7 +33,15 @@ import { UserModule } from './user/user.module';
       password: process.env.POSTGRES_PASSWORD,
       database: process.env.POSTGRES_DATABASE,
       synchronize: true, // TODO: remove in production
-      entities: [Interview, User, Organization, Job, Conversation, Member],
+      entities: [
+        Interview,
+        User,
+        Organization,
+        Job,
+        Conversation,
+        Member,
+        Department,
+      ],
     }),
     LlmModule,
     InterviewModule,
@@ -42,8 +51,9 @@ import { UserModule } from './user/user.module';
     UserModule,
     OrganizationModule,
     JobModule,
+    DepartmentModule,
   ],
-  controllers: [AppController, AuthController],
+  controllers: [AppController],
   providers: [
     AppService,
     {

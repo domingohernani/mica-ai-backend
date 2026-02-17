@@ -3,10 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
 import { ZodValidationPipe } from '../common/pipes/zod-validation.pipe';
-import {
-  type GetParamDto,
-  getParamSchema,
-} from '../common/schemas/get-param.schema';
+import { type GetParamDto } from '../common/schemas/get-param.schema';
 import now from '../utils/dates/now';
 import { Status } from './constants/status';
 import { Job } from './entities/job.entity';

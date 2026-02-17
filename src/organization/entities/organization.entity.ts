@@ -1,5 +1,6 @@
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 
+import { Department } from '../department/entities/department.entity';
 import { Member } from './member.entity';
 
 @Entity()
@@ -10,11 +11,6 @@ export class Organization {
   @Column()
   name: string;
 
-  @OneToMany(() => Member, (member: Member) => member.organization, {
-    cascade: true,
-  })
-  members: Member[];
-
   @Column('uuid')
   createdBy: string;
 
@@ -23,4 +19,18 @@ export class Organization {
 
   @Column({ type: 'timestamp' })
   updatedAt: Date;
+
+  @OneToMany(() => Member, (member: Member) => member.organization, {
+    cascade: true,
+  })
+  members: Member[];
+
+  @OneToMany(
+    () => Department,
+    (department: Department) => department.organization,
+    {
+      cascade: true,
+    },
+  )
+  departments: Department[];
 }
