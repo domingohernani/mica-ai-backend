@@ -1,10 +1,10 @@
 import z, { ZodType } from 'zod';
 
 export const departmentParamSchema: ZodType<{
-  id: string;
+  organizationId: string;
   departmentId: string;
 }> = z.object({
-  id: z.uuid(),
+  organizationId: z.uuid(),
   departmentId: z.uuid(),
 });
 
