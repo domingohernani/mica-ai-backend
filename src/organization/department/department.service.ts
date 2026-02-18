@@ -5,11 +5,11 @@ import { Repository } from 'typeorm';
 import now from '../../utils/dates/now';
 import { Department } from './entities/department.entity';
 import { CreateDepartmentDto } from './schemas/create-department.schema';
+import { DeleteDepartmentDto } from './schemas/delete-department.schema';
 import { DepartmentParamDto } from './schemas/department-param.schema';
 import { GetAllDepartmentDto } from './schemas/get-all-departments.schema';
 import { GetDepartmentsParamDto } from './schemas/get-departments-params.schema';
 import { UpdateDepartmentDto } from './schemas/update-department.schema';
-import { DeleteDepartmentDto } from './schemas/delete-department.schema';
 
 @Injectable()
 export class DepartmentService {

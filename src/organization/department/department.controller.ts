@@ -16,6 +16,7 @@ import {
   type CreateDepartmentDto,
   createDepartmentSchema,
 } from './schemas/create-department.schema';
+import { DeleteDepartmentDto } from './schemas/delete-department.schema';
 import {
   type DepartmentParamDto,
   departmentParamSchema,
@@ -29,7 +30,6 @@ import {
   type UpdateDepartmentDto,
   updateDepartmentSchema,
 } from './schemas/update-department.schema';
-import { DeleteDepartmentDto } from './schemas/delete-department.schema';
 
 @Controller('organizations/:organizationId')
 export class DepartmentController {
