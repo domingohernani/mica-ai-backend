@@ -22,6 +22,7 @@ import { Organization } from './organization/entities/organization.entity';
 import { OrganizationModule } from './organization/organization.module';
 import { User } from './user/entities/user.entity';
 import { UserModule } from './user/user.module';
+import { LocationModule } from './location/location.module';
 
 @Module({
   imports: [
@@ -52,6 +53,7 @@ import { UserModule } from './user/user.module';
     OrganizationModule,
     JobModule,
     DepartmentModule,
+    LocationModule,
   ],
   controllers: [AppController],
   providers: [
