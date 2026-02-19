@@ -19,10 +19,11 @@ import { DepartmentModule } from './organization/department/department.module';
 import { Department } from './organization/department/entities/department.entity';
 import { Member } from './organization/entities/member.entity';
 import { Organization } from './organization/entities/organization.entity';
+import { Location } from './organization/location/entities/location.entity';
+import { LocationModule } from './organization/location/location.module';
 import { OrganizationModule } from './organization/organization.module';
 import { User } from './user/entities/user.entity';
 import { UserModule } from './user/user.module';
-import { LocationModule } from './location/location.module';
 
 @Module({
   imports: [
@@ -42,6 +43,7 @@ import { LocationModule } from './location/location.module';
         Conversation,
         Member,
         Department,
+        Location,
       ],
     }),
     LlmModule,
