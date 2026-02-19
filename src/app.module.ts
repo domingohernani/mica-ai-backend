@@ -24,7 +24,6 @@ import { LocationModule } from './organization/location/location.module';
 import { OrganizationModule } from './organization/organization.module';
 import { User } from './user/entities/user.entity';
 import { UserModule } from './user/user.module';
-import { LocationModule } from './location/location.module';
 
 @Module({
   imports: [
