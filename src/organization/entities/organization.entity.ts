@@ -1,6 +1,7 @@
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 
 import { Department } from '../department/entities/department.entity';
+import { Location } from '../location/entities/location.entity';
 import { Member } from './member.entity';
 
 @Entity()
@@ -33,4 +34,9 @@ export class Organization {
     },
   )
   departments: Department[];
+
+  @OneToMany(() => Location, (location: Location) => location.organization, {
+    cascade: true,
+  })
+  locations: Location[];
 }
