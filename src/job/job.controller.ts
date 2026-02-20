@@ -1,4 +1,12 @@
-import { Body, Controller, Param, Patch, Post, UsePipes } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  Patch,
+  Post,
+  UsePipes,
+} from '@nestjs/common';
 import { Public } from 'src/common/decorators/public.decorator';
 
 import { ZodValidationPipe } from '../common/pipes/zod-validation.pipe';
@@ -12,6 +20,7 @@ import {
   type CreateJobDto,
   createJobSchema,
 } from './schemas/create-job.schema';
+import { GetAllJobsDto } from './schemas/get-all-jobs.schema';
 import {
   type UpdateJobDto,
   updateJobSchema,
@@ -22,13 +31,18 @@ export class JobController {
   constructor(private readonly jobService: JobService) {}
 
   @Public()
+  @Get(':id')
+  @UsePipes(new ZodValidationPipe(getParamSchema))
+  async findAll(@Param() organizationDto: GetParamDto): Promise<GetAllJobsDto> {
+    return await this.jobService.findAll(organizationDto);
+  }
+
   @Post()
   @UsePipes(new ZodValidationPipe(createJobSchema))
   async create(@Body() jobDto: CreateJobDto): Promise<Job> {
     return await this.jobService.create(jobDto);
   }
 
-  @Public()
   @Patch(':id')
   update(
     @Param(new ZodValidationPipe(getParamSchema)) jobId: GetParamDto,

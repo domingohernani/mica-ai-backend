@@ -1,5 +1,6 @@
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 
+import { Job } from '../../job/entities/job.entity';
 import { Department } from '../department/entities/department.entity';
 import { Location } from '../location/entities/location.entity';
 import { Member } from './member.entity';
@@ -39,4 +40,9 @@ export class Organization {
     cascade: true,
   })
   locations: Location[];
+
+  @OneToMany(() => Job, (job: Job) => job.organization, {
+    cascade: true,
+  })
+  jobs: Job[];
 }

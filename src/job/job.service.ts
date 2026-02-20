@@ -11,6 +11,7 @@ import {
   type CreateJobDto,
   createJobSchema,
 } from './schemas/create-job.schema';
+import { GetAllJobsDto } from './schemas/get-all-jobs.schema';
 import { type UpdateJobDto } from './schemas/update-job.schema';
 
 @Injectable()
@@ -21,12 +22,27 @@ export class JobService {
     private readonly job: Repository<Job>,
   ) {}
 
+  // Find all jobs
+  async findAll(organizationDto: GetParamDto): Promise<GetAllJobsDto> {
+    // Find all departments using organizationId
+    const jobs: Job[] | null = await this.job.find({
+      where: {
+        organizationId: organizationDto.id,
+      },
+      order: {
+        updatedAt: 'DESC',
+      },
+    });
+
+    return jobs;
+  }
+
   // Create Job
   async create(
     @Body(new ZodValidationPipe(createJobSchema))
     jobDto: CreateJobDto,
   ): Promise<Job> {
-    // Creating new job DTO and modifying types (string -> ObjectId)
+    // Creating new job DTO and modifying types
     const newJobDto: Job = {
       ...jobDto,
       status: Status.Open,
