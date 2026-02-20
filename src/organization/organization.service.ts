@@ -5,8 +5,8 @@ import { Repository } from 'typeorm';
 
 import { Roles } from '../constants/roles';
 import now from '../utils/dates/now';
-import { Member } from './entities/member.entity';
 import { Organization } from './entities/organization.entity';
+import { Member } from './member/entities/member.entity';
 import { CreateOrganizationDto } from './schemas/create-organization.schema';
 import { GetOrganizationDto } from './schemas/get-organization.schema';
 

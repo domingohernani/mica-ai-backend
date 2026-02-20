@@ -17,10 +17,11 @@ import { Job } from './job/entities/job.entity';
 import { JobModule } from './job/job.module';
 import { DepartmentModule } from './organization/department/department.module';
 import { Department } from './organization/department/entities/department.entity';
-import { Member } from './organization/entities/member.entity';
 import { Organization } from './organization/entities/organization.entity';
 import { Location } from './organization/location/entities/location.entity';
 import { LocationModule } from './organization/location/location.module';
+import { Member } from './organization/member/entities/member.entity';
+import { MemberModule } from './organization/member/member.module';
 import { OrganizationModule } from './organization/organization.module';
 import { User } from './user/entities/user.entity';
 import { UserModule } from './user/user.module';
@@ -56,6 +57,7 @@ import { UserModule } from './user/user.module';
     JobModule,
     DepartmentModule,
     LocationModule,
+    MemberModule,
   ],
   controllers: [AppController],
   providers: [
