@@ -1,4 +1,10 @@
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  Entity,
+  JoinColumn,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 
 import { Organization } from '../../entities/organization.entity';
 
@@ -23,5 +29,9 @@ export class Member {
       onDelete: 'CASCADE',
     },
   )
-  organization: Organization;
+  @JoinColumn({ name: 'organizationId' })
+  organization?: Organization;
+
+  @Column('uuid')
+  organizationId: string;
 }
