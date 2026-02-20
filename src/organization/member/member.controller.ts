@@ -11,14 +11,6 @@ import { GetAllMembersDto } from './schemas/get-all-members.schema';
 export class MemberController {
   constructor(private readonly memberService: MemberService) {}
 
-  //   @Get('locations')
-  //   @UsePipes(new ZodValidationPipe(getOrganizationParamSchema))
-  //   async findAll(
-  //     @Param() organizationDto: GetOrganizationParamDto,
-  //   ): Promise<GetAllMembersDto> {
-  //     // return await this.memberService.findAll(memberDto);
-  //   }
-
   @Get('members')
   @UsePipes(new ZodValidationPipe(getOrganizationParamSchema))
   async findAll(
