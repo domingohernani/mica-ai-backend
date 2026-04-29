@@ -1,4 +1,6 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+
+import { Member } from '../../organization/member/entities/member.entity';
 
 @Entity()
 export class User {
@@ -28,4 +30,9 @@ export class User {
 
   @Column({ type: 'timestamp' })
   updatedAt: Date;
+
+  @OneToMany(() => Member, (member: Member) => member.user, {
+    cascade: true,
+  })
+  members?: Member[];
 }

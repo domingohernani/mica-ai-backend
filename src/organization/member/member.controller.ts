@@ -1,4 +1,12 @@
-import { Controller, Get, Param, UsePipes } from '@nestjs/common';
+import {
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Patch,
+  Post,
+  UsePipes,
+} from '@nestjs/common';
 import { ZodValidationPipe } from 'src/common/pipes/zod-validation.pipe';
 
 import {
@@ -18,4 +26,33 @@ export class MemberController {
   ): Promise<GetAllMembersDto> {
     return await this.memberService.findAll(param);
   }
+
+  // @Post('members')
+  // async create(
+  //   @Param(new ZodValidationPipe(getOrganizationParamSchema))
+  //   @Param()
+  //   param: GetOrganizationParamDto,
+  //   @Body(new ZodValidationPipe(createDepartmentSchema))
+  //   departmentDto: CreateDepartmentDto,
+  // ): Promise<CreateDepartmentDto> {
+  //   return await this.departmentService.create(organizationDto, departmentDto);
+  // }
+
+  // @Patch('members/:memberId')
+  // async update(
+  //   @Param(new ZodValidationPipe(departmentParamSchema))
+  //   params: DepartmentParamDto,
+  //   @Body(new ZodValidationPipe(updateDepartmentSchema))
+  //   departmentDto: UpdateDepartmentDto,
+  // ): Promise<UpdateDepartmentDto> {
+  //   return await this.departmentService.update(params, departmentDto);
+  // }
+
+  // @Delete('members/:memberId')
+  // async delete(
+  //   @Param(new ZodValidationPipe(departmentParamSchema))
+  //   departmentParam: DepartmentParamDto,
+  // ): Promise<DeleteDepartmentDto> {
+  //   return await this.departmentService.delete(departmentParam);
+  // }
 }

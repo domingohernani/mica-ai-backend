@@ -6,15 +6,13 @@ import {
   PrimaryGeneratedColumn,
 } from 'typeorm';
 
+import { User } from '../../../user/entities/user.entity';
 import { Organization } from '../../entities/organization.entity';
 
 @Entity()
 export class Member {
   @PrimaryGeneratedColumn('uuid')
   id?: string;
-
-  @Column()
-  userId: string;
 
   @Column()
   role: string;
@@ -34,4 +32,13 @@ export class Member {
 
   @Column('uuid')
   organizationId: string;
+
+  @ManyToOne(() => User, (user: User) => user.members, {
+    onDelete: 'CASCADE',
+  })
+  @JoinColumn({ name: 'userId' })
+  user?: User;
+
+  @Column({ type: 'uuid' })
+  userId: string;
 }
