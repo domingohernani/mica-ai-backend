@@ -1,12 +1,14 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { GetParamDto } from 'src/common/schemas/get-param.schema';
 import { Repository } from 'typeorm';
 
 import { Roles } from '../constants/roles';
+import { User } from '../user/entities/user.entity';
 import now from '../utils/dates/now';
 import { Organization } from './entities/organization.entity';
 import { Member } from './member/entities/member.entity';
+import { MemberService } from './member/member.service';
 import { CreateOrganizationDto } from './schemas/create-organization.schema';
 import { GetOrganizationDto } from './schemas/get-organization.schema';
 
@@ -16,8 +18,10 @@ export class OrganizationService {
   constructor(
     @InjectRepository(Organization)
     private readonly organization: Repository<Organization>,
-    @InjectRepository(Member)
-    private readonly member: Repository<Member>,
+    @InjectRepository(User)
+    private readonly user: Repository<User>,
+
+    private member: MemberService,
   ) {}
 
   // Create organization and create a member
@@ -25,10 +29,19 @@ export class OrganizationService {
     userId: string,
     organizationDto: CreateOrganizationDto,
   ): Promise<Organization> {
-    // reate the organization entity without members
+    // Find the user in the database
+    const user: User | null = await this.user.findOne({
+      where: { id: userId },
+    });
+
+    if (!user || !user.id) {
+      throw new NotFoundException(`No user found for ID ${userId}.`);
+    }
+
+    // Create the organization entity without members
     const newOrganization: Organization = this.organization.create({
       ...organizationDto,
-      createdBy: userId,
+      createdBy: user.id,
       createdAt: now(),
       updatedAt: now(),
     });
@@ -37,16 +50,12 @@ export class OrganizationService {
     const savedOrg: Organization =
       await this.organization.save(newOrganization);
 
-    // Create the owner member
-    const ownerMember: Member = this.member.create({
-      organization: savedOrg, // link via foreign key
-      userId,
+    const ownerMember: Member = await this.member.create({
+      organizationId: savedOrg.id!, // link via foreign key
+      userId: user.id,
       role: Roles.Owner,
       joinedAt: now(),
     });
-
-    // Save the member
-    await this.member.save(ownerMember);
 
     // 5Attach members array for returning
     savedOrg.members = [ownerMember];
