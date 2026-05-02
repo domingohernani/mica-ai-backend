@@ -29,7 +29,22 @@ export class MemberService {
       },
     });
 
-    return members;
+    // Transform the members array base on the DTO
+    const membersDto: GetAllMembersDto = members.map((member: Member) => {
+      return {
+        id: member.id,
+        userId: member.userId,
+        joinedAt: member.joinedAt,
+        organizationId: member.organizationId,
+        role: member.role,
+        email: member.user!.email,
+        firstName: member.user!.firstName,
+        lastName: member.user!.lastName,
+        profileUrl: member.user!.profileUrl,
+      };
+    });
+
+    return membersDto;
   }
 
   async create(memberDto: CreateMemberDto): Promise<GetMemberDto> {

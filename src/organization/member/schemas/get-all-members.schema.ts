@@ -7,6 +7,10 @@ type GetAllMembers = {
   role: string;
   joinedAt: Date;
   organizationId: string;
+  email: string;
+  firstName: string;
+  lastName: string;
+  profileUrl: string;
 };
 
 export const getAllMembersSchema: ZodType<GetAllMembers[]> = z.array(
@@ -15,6 +19,10 @@ export const getAllMembersSchema: ZodType<GetAllMembers[]> = z.array(
     role: z.enum(Roles),
     joinedAt: z.date(),
     organizationId: z.uuid(),
+    email: z.email(),
+    firstName: z.string(),
+    lastName: z.string(),
+    profileUrl: z.url(),
   }),
 );
 
