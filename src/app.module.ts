@@ -1,3 +1,4 @@
+import { Connector } from '@google-cloud/cloud-sql-connector';
 import { Module } from '@nestjs/common';
 import { APP_GUARD } from '@nestjs/core';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -26,27 +27,58 @@ import { OrganizationModule } from './organization/organization.module';
 import { User } from './user/entities/user.entity';
 import { UserModule } from './user/user.module';
 
+// Generates the Cloud SQL connection options dynamically
+const connector: Connector = new Connector();
+const getAuthOptions: () => Promise<unknown> = async (): Promise<unknown> => {
+  const clientOpts: unknown = await connector.getOptions({
+    instanceConnectionName: 'mica-ai-495106:us-central1:mica-ai-db',
+    // @ts-expect-error // Value is guaranteed correct
+    ipType: 'PUBLIC',
+    // @ts-expect-error // Value is guaranteed correct
+    authType: 'IAM',
+  });
+  return clientOpts;
+};
+
+type Constructor = new (...args: unknown[]) => unknown;
+const ENTITIES_LIST: Constructor[] = [
+  Interview,
+  User,
+  Organization,
+  Job,
+  Conversation,
+  Member,
+  Department,
+  Location,
+];
+
 @Module({
   imports: [
-    TypeOrmModule.forRoot({
-      type: 'postgres',
-      host: process.env.POSTGRES_HOST,
-      port: parseInt(process.env.POSTGRES_PORT!),
-      username: process.env.POSTGRES_USERNAME,
-      password: process.env.POSTGRES_PASSWORD,
-      database: process.env.POSTGRES_DATABASE,
-      synchronize: true, // TODO: remove in production
-      entities: [
-        Interview,
-        User,
-        Organization,
-        Job,
-        Conversation,
-        Member,
-        Department,
-        Location,
-      ],
+    TypeOrmModule.forRootAsync({
+      useFactory: async () => {
+        return process.env.NODE_ENV === 'production'
+          ? {
+              type: 'postgres',
+              extra: await getAuthOptions(),
+              database: process.env.DB_NAME,
+              username: 'mica-ai-495106@appspot.gserviceaccount.com',
+              autoLoadEntities: true,
+              synchronize: false,
+              entities: ENTITIES_LIST,
+            }
+          : {
+              type: 'postgres',
+              host: process.env.POSTGRES_HOST,
+              port: parseInt(process.env.POSTGRES_PORT!),
+              username: process.env.POSTGRES_USERNAME,
+              password: process.env.POSTGRES_PASSWORD,
+              database: process.env.POSTGRES_DATABASE,
+              synchronize: true, // TODO: remove in production
+              entities: ENTITIES_LIST,
+            };
+      },
     }),
+
     LlmModule,
     InterviewModule,
     SpeechModule,

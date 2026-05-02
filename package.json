@@ -21,6 +21,7 @@
     "test:e2e": "jest --config ./test/jest-e2e.json"
   },
   "dependencies": {
+    "@google-cloud/cloud-sql-connector": "^1.10.0",
     "@google-cloud/speech": "^7.2.1",
     "@google-cloud/storage": "^7.17.3",
     "@google-cloud/text-to-speech": "^6.4.0",
@@ -49,6 +50,7 @@
     "@types/express": "^5.0.0",
     "@types/jest": "^30.0.0",
     "@types/luxon": "^3.7.1",
+    "@types/mocha": "^10.0.10",
     "@types/multer": "^2.0.0",
     "@types/node": "^25.2.3",
     "@types/passport-jwt": "^4.0.1",
