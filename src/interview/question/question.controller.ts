@@ -16,8 +16,8 @@ import { InterviewDto } from '../interview.dto';
 import { getParamSchema } from './../../common/schemas/get-param.schema';
 import { QuestionService } from './question.service';
 import type { GetQuestionDto } from './schemas/get-question.schema';
-import type { GetQuestionParamDto } from './schemas/get-question-param.schema';
-import { getQuestionParamSchema } from './schemas/get-question-param.schema';
+import type { QuestionParamDto } from './schemas/question-param.schema';
+import { questionParamSchema } from './schemas/question-param.schema';
 
 @Controller('interviews/:id')
 export class QuestionController {
@@ -34,8 +34,8 @@ export class QuestionController {
   @Patch('questions/:questionId')
   @UseInterceptors(FileInterceptor('video'))
   async update(
-    @Param(new ZodValidationPipe(getQuestionParamSchema))
-    params: GetQuestionParamDto,
+    @Param(new ZodValidationPipe(questionParamSchema))
+    params: QuestionParamDto,
     @UploadedFile() videoBuffer: Buffer,
   ): Promise<GetQuestionDto | InterviewDto> {
     return await this.questionService.updateAndTransribe(
@@ -48,8 +48,8 @@ export class QuestionController {
   @Post('questions/:questionId/chunk')
   @UseInterceptors(FileInterceptor('chunk'))
   async updateChunk(
-    @Param(new ZodValidationPipe(getQuestionParamSchema))
-    params: GetQuestionParamDto,
+    @Param(new ZodValidationPipe(questionParamSchema))
+    params: QuestionParamDto,
     @UploadedFile() chunk: Express.Multer.File,
     @Body() body: { chunkNumber: string; isLastChunk: string },
   ): Promise<GetQuestionDto | InterviewDto | { isChunkStored: true }> {

@@ -1,6 +1,6 @@
 import z, { ZodType } from 'zod';
 
-export const getQuestionParamSchema: ZodType<{
+export const questionParamSchema: ZodType<{
   id: string;
   questionId: string;
 }> = z.object({
@@ -8,4 +8,4 @@ export const getQuestionParamSchema: ZodType<{
   questionId: z.uuid(),
 });
 
-export type GetQuestionParamDto = z.infer<typeof getQuestionParamSchema>;
+export type QuestionParamDto = z.infer<typeof questionParamSchema>;
