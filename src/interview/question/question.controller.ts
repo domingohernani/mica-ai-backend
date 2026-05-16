@@ -19,8 +19,6 @@ import type { GetQuestionDto } from './schemas/get-question.schema';
 import type { GetQuestionParamDto } from './schemas/get-question-param.schema';
 import { getQuestionParamSchema } from './schemas/get-question-param.schema';
 
-// TODO: modularize
-
 @Controller('interviews/:id')
 export class QuestionController {
   constructor(private readonly questionService: QuestionService) {}
