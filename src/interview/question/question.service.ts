@@ -215,8 +215,12 @@ export class QuestionService {
 
     const rawPath: string = `${interviewDto.id}/${currentQuestion.order}`;
     const videoPath: string = rawPath.concat('/video-answer.webm');
-    const bucketName: string = 'recorded-temp';
+    const bucketName: string | undefined =
+      process.env.GOOGLE_CLOUD_STORAGE_BUCKET_NAME;
 
+    if (!bucketName) {
+      throw new InternalServerErrorException('Cloud bucket name is missing.');
+    }
     // Store the mp4
     await this.storage.upload(videoBuffer, videoPath);
 

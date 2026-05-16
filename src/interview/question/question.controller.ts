@@ -9,8 +9,8 @@ import {
   UseInterceptors,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { ZodValidationPipe } from 'src/common/pipes/zod-validation.pipe';
 
+import { ZodValidationPipe } from '../../common/pipes/zod-validation.pipe';
 import { type GetParamDto } from '../../common/schemas/get-param.schema';
 import { InterviewDto } from '../interview.dto';
 import { getParamSchema } from './../../common/schemas/get-param.schema';

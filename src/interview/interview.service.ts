@@ -1,9 +1,9 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { StorageService } from 'src/infrastructure/storage/storage.service';
 import { Repository } from 'typeorm';
 
 import { GetParamDto } from '../common/schemas/get-param.schema';
+import { StorageService } from '../infrastructure/storage/storage.service';
 import { Interview } from './entities/interview.entity';
 import { InterviewDto } from './interview.dto';
 import { QuestionDto } from './question/question.dto';

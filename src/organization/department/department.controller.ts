@@ -8,8 +8,8 @@ import {
   Post,
   UsePipes,
 } from '@nestjs/common';
-import { Public } from 'src/common/decorators/public.decorator';
 
+import { Public } from '../../common/decorators/public.decorator';
 import { ZodValidationPipe } from '../../common/pipes/zod-validation.pipe';
 import { DepartmentService } from './department.service';
 import {

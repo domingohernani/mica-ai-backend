@@ -1,8 +1,8 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { GetParamDto } from 'src/common/schemas/get-param.schema';
 import { Repository } from 'typeorm';
 
+import { GetParamDto } from '../common/schemas/get-param.schema';
 import { Roles } from '../constants/roles';
 import { User } from '../user/entities/user.entity';
 import now from '../utils/dates/now';

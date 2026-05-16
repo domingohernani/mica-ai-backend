@@ -1,7 +1,7 @@
 import { Body, Controller, Get, Post, UsePipes } from '@nestjs/common';
-import { ZodValidationPipe } from 'src/common/pipes/zod-validation.pipe';
 
 import { User as AppUser } from '../common/decorators/user.decorator';
+import { ZodValidationPipe } from '../common/pipes/zod-validation.pipe';
 import type { GetUserDto } from '../common/schemas/get-user.schema';
 import { User } from './entities/user.entity';
 import type { CreateUserDto } from './schemas/create-user.schema';

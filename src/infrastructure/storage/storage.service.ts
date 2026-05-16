@@ -3,7 +3,7 @@ import type {
   GetSignedUrlResponse,
 } from '@google-cloud/storage';
 import { Bucket, File, Storage } from '@google-cloud/storage';
-import { Injectable } from '@nestjs/common';
+import { Injectable, InternalServerErrorException } from '@nestjs/common';
 
 @Injectable()
 export class StorageService {
@@ -12,8 +12,16 @@ export class StorageService {
 
   // Initialize cliend and bucket name;
   constructor() {
-    this.client = new Storage();
-    this.bucket = 'recorded-temp';
+    this.client = new Storage({
+      projectId: process.env.GOOGLE_CLOUD_PROJECT_ID,
+    });
+
+    const bucketName: string | undefined =
+      process.env.GOOGLE_CLOUD_STORAGE_BUCKET_NAME;
+    if (!bucketName) {
+      throw new InternalServerErrorException('Cloud bucket name is missing.');
+    }
+    this.bucket = bucketName;
   }
   // Update file on cloud
   async upload(bufferFile: Buffer, filePath: string): Promise<void> {

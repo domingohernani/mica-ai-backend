@@ -14,8 +14,12 @@ export class SpeechService {
   private clientStt: SpeechClient;
 
   constructor() {
-    this.clientTts = new TextToSpeechClient();
-    this.clientStt = new SpeechClient();
+    this.clientTts = new TextToSpeechClient({
+      projectId: process.env.GOOGLE_CLOUD_PROJECT_ID,
+    });
+    this.clientStt = new SpeechClient({
+      projectId: process.env.GOOGLE_CLOUD_PROJECT_ID,
+    });
   }
 
   async synthesize(text: string): Promise<SynthesizeResponse> {

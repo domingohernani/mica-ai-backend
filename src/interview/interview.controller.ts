@@ -1,7 +1,7 @@
 import { Body, Controller, Get, Param, Post, UsePipes } from '@nestjs/common';
-import { Public } from 'src/common/decorators/public.decorator';
-import { ZodValidationPipe } from 'src/common/pipes/zod-validation.pipe';
 
+import { Public } from '../common/decorators/public.decorator';
+import { ZodValidationPipe } from '../common/pipes/zod-validation.pipe';
 import type { GetParamDto } from '../common/schemas/get-param.schema';
 import { getParamSchema } from '../common/schemas/get-param.schema';
 import { InterviewDto } from './interview.dto';

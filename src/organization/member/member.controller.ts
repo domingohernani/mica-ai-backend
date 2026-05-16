@@ -7,8 +7,8 @@ import {
   Post,
   UsePipes,
 } from '@nestjs/common';
-import { ZodValidationPipe } from 'src/common/pipes/zod-validation.pipe';
 
+import { ZodValidationPipe } from '../../common/pipes/zod-validation.pipe';
 import {
   type GetOrganizationParamDto,
   getOrganizationParamSchema,
