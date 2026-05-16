@@ -34,16 +34,13 @@ export class QuestionController {
   @Patch('questions/:questionId')
   @UseInterceptors(FileInterceptor('video'))
   async update(
-    @Param('id') id: string,
-    @Param('questionId') questionId: string,
+    @Param(new ZodValidationPipe(getQuestionParamSchema))
+    params: GetQuestionParamDto,
     @UploadedFile() videoBuffer: Buffer,
   ): Promise<GetQuestionDto | InterviewDto> {
-    const params: GetQuestionParamDto = { id, questionId };
-    const validated: GetQuestionParamDto = getQuestionParamSchema.parse(params);
-
     return await this.questionService.updateAndTransribe(
-      { id: validated.id },
-      { id: validated.questionId },
+      { id: params.id },
+      { id: params.questionId },
       videoBuffer,
     );
   }
@@ -51,21 +48,18 @@ export class QuestionController {
   @Post('questions/:questionId/chunk')
   @UseInterceptors(FileInterceptor('chunk'))
   async updateChunk(
-    @Param('id') id: string,
-    @Param('questionId') questionId: string,
+    @Param(new ZodValidationPipe(getQuestionParamSchema))
+    params: GetQuestionParamDto,
     @UploadedFile() chunk: Express.Multer.File,
     @Body() body: { chunkNumber: string; isLastChunk: string },
   ): Promise<GetQuestionDto | InterviewDto | { isChunkStored: true }> {
-    const params: GetQuestionParamDto = { id, questionId };
-    const validated: GetQuestionParamDto = getQuestionParamSchema.parse(params);
-
     // Type conversion
     const parsedChunkNumber: number = parseInt(body.chunkNumber, 10);
     const parsedIsLastChunk: boolean = body.isLastChunk === 'true';
 
     return await this.questionService.updateByChunk(
-      { id: validated.id },
-      { id: validated.questionId },
+      { id: params.id },
+      { id: params.questionId },
       parsedChunkNumber,
       chunk,
       parsedIsLastChunk,
