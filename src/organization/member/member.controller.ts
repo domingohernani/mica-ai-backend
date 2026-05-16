@@ -1,18 +1,10 @@
-import {
-  Controller,
-  Delete,
-  Get,
-  Param,
-  Patch,
-  Post,
-  UsePipes,
-} from '@nestjs/common';
+import { Controller, Get, Param, UsePipes } from '@nestjs/common';
 
 import { ZodValidationPipe } from '../../common/pipes/zod-validation.pipe';
 import {
-  type GetOrganizationParamDto,
-  getOrganizationParamSchema,
-} from '../schemas/get-organization.param';
+  type OrganizationParamDto,
+  organizationParamSchema,
+} from '../schemas/organization.param';
 import { MemberService } from './member.service';
 import { GetAllMembersDto } from './schemas/get-all-members.schema';
 @Controller('organizations/:organizationId')
@@ -20,9 +12,9 @@ export class MemberController {
   constructor(private readonly memberService: MemberService) {}
 
   @Get('members')
-  @UsePipes(new ZodValidationPipe(getOrganizationParamSchema))
+  @UsePipes(new ZodValidationPipe(organizationParamSchema))
   async findAll(
-    @Param() param: GetOrganizationParamDto,
+    @Param() param: OrganizationParamDto,
   ): Promise<GetAllMembersDto> {
     return await this.memberService.findAll(param);
   }

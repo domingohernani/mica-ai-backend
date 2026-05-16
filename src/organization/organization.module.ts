@@ -12,7 +12,7 @@ import { OrganizationService } from './organization.service';
 @Module({
   providers: [OrganizationService],
   controllers: [OrganizationController],
-  exports: [],
+  exports: [OrganizationService],
   imports: [
     MemberModule,
     TypeOrmModule.forFeature([Organization, Member, Department, User]),

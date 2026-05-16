@@ -24,6 +24,21 @@ export class OrganizationService {
     private member: MemberService,
   ) {}
 
+  // Find organization
+  async find(organizationDto: GetParamDto): Promise<GetOrganizationDto> {
+    const organization: Organization | null = await this.organization.findOne({
+      where: { id: organizationDto.id },
+    });
+
+    if (!organization || !organization.id) {
+      throw new NotFoundException(
+        `No organization found for ID ${organizationDto.id}.`,
+      );
+    }
+
+    return { id: organizationDto.id, ...organization };
+  }
+
   // Create organization and create a member
   async create(
     userId: string,

@@ -5,5 +5,6 @@ export class InterviewDto {
   conversations: Conversation[];
   readonly isDone: boolean;
   readonly finalMessage: string;
+  organizationId: string;
   readonly finalTtsSignedUrl?: string;
 }

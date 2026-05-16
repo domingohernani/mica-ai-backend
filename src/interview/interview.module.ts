@@ -7,6 +7,7 @@ import { Interview } from './entities/interview.entity';
 import { InterviewController } from './interview.controller';
 import { InterviewService } from './interview.service';
 import { QuestionModule } from './question/question.module';
+import { OrganizationModule } from '../organization/organization.module';
 
 @Module({
   controllers: [InterviewController],
@@ -16,6 +17,7 @@ import { QuestionModule } from './question/question.module';
     TypeOrmModule.forFeature([Interview, Conversation]),
     forwardRef(() => QuestionModule),
     StorageModule,
+    OrganizationModule,
   ],
 })
 export class InterviewModule {}

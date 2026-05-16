@@ -4,6 +4,7 @@ import { Job } from '../../job/entities/job.entity';
 import { Department } from '../department/entities/department.entity';
 import { Location } from '../location/entities/location.entity';
 import { Member } from '../member/entities/member.entity';
+import { Interview } from '../../interview/entities/interview.entity';
 
 @Entity()
 export class Organization {
@@ -45,4 +46,14 @@ export class Organization {
     cascade: true,
   })
   jobs: Job[];
+
+  @OneToMany(
+    () => Interview,
+    (interviews: Interview) => interviews.organization,
+    {
+      cascade: true,
+      eager: true,
+    },
+  )
+  interviews: Interview[];
 }

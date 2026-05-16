@@ -28,7 +28,6 @@ export class Conversation {
   @Column({ default: false })
   isAnswered: boolean;
 
-  // This represent the interviewId
   @ManyToOne(() => Interview, (interview: Interview) => interview.conversations)
   @JoinColumn({ name: 'interviewId' })
   interview?: Interview;

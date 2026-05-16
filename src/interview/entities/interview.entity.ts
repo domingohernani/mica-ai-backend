@@ -1,6 +1,14 @@
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  Entity,
+  JoinColumn,
+  ManyToOne,
+  OneToMany,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 
 import { Conversation } from './conversation.entity';
+import { Organization } from '../../organization/entities/organization.entity';
 
 @Entity()
 export class Interview {
@@ -23,4 +31,15 @@ export class Interview {
     },
   )
   conversations: Conversation[];
+
+  // This represent the organizationId
+  @ManyToOne(
+    () => Organization,
+    (organization: Organization) => organization.interviews,
+  )
+  @JoinColumn({ name: 'organizationId' })
+  organization: Organization;
+
+  @Column('uuid')
+  organizationId: string;
 }
