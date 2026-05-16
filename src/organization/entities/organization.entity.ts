@@ -1,10 +1,10 @@
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 
+import { Interview } from '../../interview/entities/interview.entity';
 import { Job } from '../../job/entities/job.entity';
 import { Department } from '../department/entities/department.entity';
 import { Location } from '../location/entities/location.entity';
 import { Member } from '../member/entities/member.entity';
-import { Interview } from '../../interview/entities/interview.entity';
 
 @Entity()
 export class Organization {

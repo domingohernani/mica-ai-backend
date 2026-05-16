@@ -4,10 +4,10 @@ import { Repository } from 'typeorm';
 
 import { GetParamDto } from '../common/schemas/get-param.schema';
 import { StorageService } from '../infrastructure/storage/storage.service';
+import { OrganizationService } from '../organization/organization.service';
 import { Interview } from './entities/interview.entity';
 import { InterviewDto } from './interview.dto';
 import { QuestionDto } from './question/question.dto';
-import { OrganizationService } from '../organization/organization.service';
 
 @Injectable()
 export class InterviewService {

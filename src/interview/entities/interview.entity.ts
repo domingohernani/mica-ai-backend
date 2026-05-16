@@ -7,8 +7,8 @@ import {
   PrimaryGeneratedColumn,
 } from 'typeorm';
 
-import { Conversation } from './conversation.entity';
 import { Organization } from '../../organization/entities/organization.entity';
+import { Conversation } from './conversation.entity';
 
 @Entity()
 export class Interview {
