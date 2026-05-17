@@ -57,8 +57,8 @@ export class Job {
   @Column({ default: 1 })
   openPositions: number;
 
-  @Column({ type: 'date', nullable: true })
-  applicationDeadline?: string;
+  @Column({ type: 'timestamp', nullable: true })
+  applicationDeadline?: Date;
 
   @Column({ type: 'simple-array', nullable: true })
   skills?: string[];

@@ -52,7 +52,6 @@ export class Organization {
     (interviews: Interview) => interviews.organization,
     {
       cascade: true,
-      eager: true,
     },
   )
   interviews: Interview[];

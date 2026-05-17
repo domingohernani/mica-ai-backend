@@ -18,7 +18,7 @@ export const getAllJobsSchema: ZodType<
     salaryMax?: number;
     benefits?: string;
     openPositions: number;
-    applicationDeadline?: string;
+    applicationDeadline?: Date;
     skills?: string[];
   }[]
 > = z.array(
@@ -42,7 +42,7 @@ export const getAllJobsSchema: ZodType<
     salaryMax: z.number().min(0).optional(),
     benefits: z.string().optional(),
     openPositions: z.number().min(1).default(1),
-    applicationDeadline: z.string().optional(),
+    applicationDeadline: z.date().optional(),
     skills: z.array(z.string()).optional(),
   }),
 );

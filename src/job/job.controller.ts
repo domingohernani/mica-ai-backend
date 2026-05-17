@@ -21,6 +21,7 @@ import {
   createJobSchema,
 } from './schemas/create-job.schema';
 import { GetAllJobsDto } from './schemas/get-all-jobs.schema';
+import { type JobsDto } from './schemas/job.schema';
 import {
   type UpdateJobDto,
   updateJobSchema,
@@ -30,10 +31,19 @@ import {
 export class JobController {
   constructor(private readonly jobService: JobService) {}
 
+  @Public()
   @Get(':id')
   @UsePipes(new ZodValidationPipe(getParamSchema))
-  async findAll(@Param() organizationDto: GetParamDto): Promise<GetAllJobsDto> {
-    return await this.jobService.findAll(organizationDto);
+  async find(@Param() interviewDto: GetParamDto): Promise<JobsDto> {
+    return await this.jobService.find(interviewDto);
+  }
+
+  @Get('/organization/:id')
+  @UsePipes(new ZodValidationPipe(getParamSchema))
+  async findAllByOrganizationId(
+    @Param() organizationDto: GetParamDto,
+  ): Promise<GetAllJobsDto> {
+    return await this.jobService.findAllByOrganizationId(organizationDto);
   }
 
   @Post()
