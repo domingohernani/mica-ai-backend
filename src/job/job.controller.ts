@@ -30,7 +30,6 @@ import {
 export class JobController {
   constructor(private readonly jobService: JobService) {}
 
-  @Public()
   @Get(':id')
   @UsePipes(new ZodValidationPipe(getParamSchema))
   async findAll(@Param() organizationDto: GetParamDto): Promise<GetAllJobsDto> {
