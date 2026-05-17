@@ -64,6 +64,15 @@ export class InterviewService {
     return interview;
   }
 
+  async findAllByOrganizationId(
+    organizationDto: GetParamDto,
+  ): Promise<InterviewDto[]> {
+    const interviews: Interview[] = await this.interview.find({
+      where: { organizationId: organizationDto.id },
+    });
+    return interviews;
+  }
+
   // Create an interview document
   async create(
     // TODO: change the GetParamDto to ParamDto, since it is being use on diff methods.

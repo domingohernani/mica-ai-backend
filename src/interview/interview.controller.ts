@@ -16,7 +16,7 @@ export class InterviewController {
   constructor(private readonly interviewService: InterviewService) {}
 
   @Get('interviews/:interviewId')
-  async find(
+  async findByOrganizationId(
     @Param(new ZodValidationPipe(interviewParamSchema))
     params: InterviewParamDto,
   ): Promise<InterviewDto> {
@@ -24,6 +24,14 @@ export class InterviewController {
       { id: params.id },
       { id: params.interviewId },
     );
+  }
+
+  @Get('interviews')
+  async findAllByOrganizationId(
+    @Param(new ZodValidationPipe(getParamSchema))
+    param: GetParamDto,
+  ): Promise<InterviewDto[]> {
+    return await this.interviewService.findAllByOrganizationId(param);
   }
 
   @Post('interviews')
