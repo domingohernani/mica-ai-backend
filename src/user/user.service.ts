@@ -54,8 +54,6 @@ export class UserService {
       id: user.id.toString(),
     };
 
-    console.log(userDto);
-
     return userDto;
   }
 }
