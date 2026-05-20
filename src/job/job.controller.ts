@@ -5,8 +5,11 @@ import {
   Param,
   Patch,
   Post,
+  UploadedFile,
+  UseInterceptors,
   UsePipes,
 } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
 
 import { Public } from '../common/decorators/public.decorator';
 import { ZodValidationPipe } from '../common/pipes/zod-validation.pipe';
@@ -17,6 +20,10 @@ import {
 import { Job } from './entities/job.entity';
 import { JobService } from './job.service';
 import {
+  type ApplicationDto,
+  createApplicationSchema,
+} from './schemas/create-application.schema';
+import {
   type CreateJobDto,
   createJobSchema,
 } from './schemas/create-job.schema';
@@ -26,6 +33,7 @@ import {
   type UpdateJobDto,
   updateJobSchema,
 } from './schemas/update-job.schema';
+import { JobApplication } from './entities/job-application.entity';
 
 @Controller('jobs')
 export class JobController {
@@ -52,11 +60,30 @@ export class JobController {
     return await this.jobService.create(jobDto);
   }
 
+  // TODO: implement
   @Patch(':id')
   update(
     @Param(new ZodValidationPipe(getParamSchema)) jobId: GetParamDto,
     @Body(new ZodValidationPipe(updateJobSchema)) jobBody: UpdateJobDto,
   ): void {
     this.jobService.update(jobId, jobBody);
+  }
+
+  // Applications
+  @Post(':id/applications')
+  @UseInterceptors(FileInterceptor('resume'))
+  async createApplication(
+    @Param(new ZodValidationPipe(getParamSchema)) jobId: GetParamDto,
+    @UploadedFile() file: Express.Multer.File,
+    @Body(new ZodValidationPipe(createApplicationSchema))
+    applicationBody: ApplicationDto,
+  ): Promise<JobApplication> {
+    console.log(applicationBody);
+
+    return await this.jobService.createApplication(
+      jobId,
+      applicationBody,
+      file,
+    );
   }
 }
