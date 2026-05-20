@@ -28,6 +28,7 @@ import {
   type CreateJobDto,
   createJobSchema,
 } from './schemas/create-job.schema';
+import { GetAllApplicationDto } from './schemas/get-all-applicatons.schema';
 import { GetAllJobsDto } from './schemas/get-all-jobs.schema';
 import { type JobsDto } from './schemas/job.schema';
 import {
@@ -85,5 +86,13 @@ export class JobController {
       applicationBody,
       file,
     );
+  }
+
+  @Get(':id/applications')
+  @UsePipes(new ZodValidationPipe(getParamSchema))
+  async getAllApplications(
+    @Param() jobDto: GetParamDto,
+  ): Promise<GetAllApplicationDto> {
+    return this.jobService.getAllApplications(jobDto);
   }
 }

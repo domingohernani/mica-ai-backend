@@ -15,6 +15,7 @@ import {
   type CreateJobDto,
   createJobSchema,
 } from './schemas/create-job.schema';
+import { GetAllApplicationDto } from './schemas/get-all-applicatons.schema';
 import { GetAllJobsDto } from './schemas/get-all-jobs.schema';
 import { type JobsDto } from './schemas/job.schema';
 import { type UpdateJobDto } from './schemas/update-job.schema';
@@ -127,5 +128,19 @@ export class JobService {
     await this.application.save(newApplication);
 
     return newApplicationDto;
+  }
+
+  async getAllApplications(jobDto: GetParamDto): Promise<GetAllApplicationDto> {
+    // Find all departments using organizationId
+    const applications: JobApplication[] | null = await this.application.find({
+      where: {
+        jobId: jobDto.id,
+      },
+      order: {
+        updatedAt: 'DESC',
+      },
+    });
+
+    return applications;
   }
 }
