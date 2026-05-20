@@ -132,7 +132,7 @@ export class JobService {
 
   async getAllApplications(jobDto: GetParamDto): Promise<GetAllApplicationDto> {
     // Find all departments using organizationId
-    const applications: JobApplication[] | null = await this.application.find({
+    const applications: JobApplication[] = await this.application.find({
       where: {
         jobId: jobDto.id,
       },
@@ -140,7 +140,6 @@ export class JobService {
         updatedAt: 'DESC',
       },
     });
-
     return applications;
   }
 }
