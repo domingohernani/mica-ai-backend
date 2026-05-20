@@ -14,6 +14,7 @@ import { Conversation } from './interview/entities/conversation.entity';
 import { Interview } from './interview/entities/interview.entity';
 import { InterviewModule } from './interview/interview.module';
 import { Job } from './job/entities/job.entity';
+import { JobApplication } from './job/entities/job-application.entity';
 import { JobModule } from './job/job.module';
 import { DepartmentModule } from './organization/department/department.module';
 import { Department } from './organization/department/entities/department.entity';
@@ -49,6 +50,7 @@ import { UserModule } from './user/user.module';
             Member,
             Department,
             Location,
+            JobApplication,
           ],
         };
       },

@@ -4,10 +4,13 @@ import { Repository } from 'typeorm';
 
 import { ZodValidationPipe } from '../common/pipes/zod-validation.pipe';
 import { type GetParamDto } from '../common/schemas/get-param.schema';
+import { StorageService } from '../infrastructure/storage/storage.service';
 import now from '../utils/dates/now';
 import toTimestamp from '../utils/dates/toTimestamp';
 import { Status } from './constants/status';
 import { Job } from './entities/job.entity';
+import { JobApplication } from './entities/job-application.entity';
+import { ApplicationDto } from './schemas/create-application.schema';
 import {
   type CreateJobDto,
   createJobSchema,
@@ -22,6 +25,9 @@ export class JobService {
   constructor(
     @InjectRepository(Job)
     private readonly job: Repository<Job>,
+    @InjectRepository(JobApplication)
+    private readonly application: Repository<JobApplication>,
+    private storage: StorageService,
   ) {}
 
   // Find a job
@@ -92,5 +98,34 @@ export class JobService {
     console.log(jobBody);
 
     return;
+  }
+
+  async createApplication(
+    jobDto: GetParamDto,
+    applicationBody: ApplicationDto,
+    file: Express.Multer.File,
+  ): Promise<JobApplication> {
+    const bucketName: string = 'mica-ai-resumes';
+    const path: string = `${jobDto.id}/${file.originalname}`;
+
+    // Upload resume
+    await this.storage.upload(file.buffer, path, bucketName);
+
+    // Creating new application DTO and modifying types
+    const newApplicationDto: JobApplication = {
+      ...applicationBody.details,
+      jobId: jobDto.id,
+      resumePath: path,
+      appliedAt: now(),
+      updatedAt: now(),
+    };
+
+    const newApplication: JobApplication =
+      this.application.create(newApplicationDto);
+    // Return and save into the database
+
+    await this.application.save(newApplication);
+
+    return newApplicationDto;
   }
 }

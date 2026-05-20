@@ -3,10 +3,12 @@ import {
   Entity,
   JoinColumn,
   ManyToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 
 import { Organization } from '../../organization/entities/organization.entity';
+import { JobApplication } from './job-application.entity';
 
 @Entity()
 export class Job {
@@ -80,4 +82,14 @@ export class Job {
 
   @Column('uuid')
   organizationId: string;
+
+  // This respresents job application
+  @OneToMany(
+    () => JobApplication,
+    (applications: JobApplication) => applications.job,
+    {
+      cascade: true,
+    },
+  )
+  applications?: JobApplication[];
 }

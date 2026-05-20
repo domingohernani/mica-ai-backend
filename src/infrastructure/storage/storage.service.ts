@@ -24,8 +24,12 @@ export class StorageService {
     this.bucket = bucketName;
   }
   // Update file on cloud
-  async upload(bufferFile: Buffer, filePath: string): Promise<void> {
-    const currentBucket: Bucket = this.client.bucket(this.bucket);
+  async upload(
+    bufferFile: Buffer,
+    filePath: string,
+    bucketName?: string,
+  ): Promise<void> {
+    const currentBucket: Bucket = this.client.bucket(bucketName ?? this.bucket);
     const file: File = currentBucket.file(filePath);
     await file.save(bufferFile);
   }
