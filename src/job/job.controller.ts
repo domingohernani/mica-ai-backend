@@ -34,6 +34,7 @@ import {
   type UpdateJobDto,
   updateJobSchema,
 } from './schemas/update-job.schema';
+import { JobApplication } from './entities/job-application.entity';
 
 @Controller('jobs')
 export class JobController {
