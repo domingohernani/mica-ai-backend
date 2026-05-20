@@ -90,9 +90,9 @@ export class JobController {
 
   @Get(':id/applications')
   @UsePipes(new ZodValidationPipe(getParamSchema))
-  async getAllApplications(
+  async findAllApplications(
     @Param() jobDto: GetParamDto,
   ): Promise<GetAllApplicationDto> {
-    return this.jobService.getAllApplications(jobDto);
+    return this.jobService.findAllApplications(jobDto);
   }
 }
