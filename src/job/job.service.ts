@@ -80,7 +80,7 @@ export class JobService {
     // Creating new job DTO and modifying types
     const newJobDto: Job = {
       ...jobDto,
-      status: JobStatus.Open,
+      status: JobStatus.OPEN,
       applicationDeadline: jobDto.applicationDeadline
         ? toTimestamp(jobDto.applicationDeadline)
         : undefined,

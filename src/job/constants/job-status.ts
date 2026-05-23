@@ -1,5 +1,5 @@
 export enum JobStatus {
-  Open = 'Open',
-  Paused = 'Paused',
-  Closed = 'Closed',
+  OPEN = 'Open',
+  PAUSED = 'Paused',
+  CLOSED = 'Closed',
 }
