@@ -7,7 +7,7 @@ import { type GetParamDto } from '../common/schemas/get-param.schema';
 import { StorageService } from '../infrastructure/storage/storage.service';
 import now from '../utils/dates/now';
 import toTimestamp from '../utils/dates/toTimestamp';
-import { Status } from './constants/status';
+import { JobStatus } from './constants/job-status';
 import { Job } from './entities/job.entity';
 import { JobApplication } from './entities/job-application.entity';
 import { ApplicationDto } from './schemas/create-application.schema';
@@ -80,7 +80,7 @@ export class JobService {
     // Creating new job DTO and modifying types
     const newJobDto: Job = {
       ...jobDto,
-      status: Status.Open,
+      status: JobStatus.Open,
       applicationDeadline: jobDto.applicationDeadline
         ? toTimestamp(jobDto.applicationDeadline)
         : undefined,

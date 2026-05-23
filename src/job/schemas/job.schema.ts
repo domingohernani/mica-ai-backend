@@ -1,6 +1,6 @@
 import z, { ZodType } from 'zod';
 
-import { Status } from '../constants/status';
+import { JobStatus } from '../constants/job-status';
 
 export const jobSchema: ZodType<{
   organizationId: string;
@@ -32,7 +32,7 @@ export const jobSchema: ZodType<{
   description: z.string(),
   requirements: z.string(),
   assignedRecruiter: z.string(),
-  status: z.enum(Status),
+  status: z.enum(JobStatus),
 
   // Optional fields
   salaryMin: z.number().min(0).optional(),
