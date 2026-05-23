@@ -114,6 +114,12 @@ export class OrganizationService {
       where: {
         organizationId: organizationDto.id,
       },
+      relations: ['job'],
+      select: {
+        job: {
+          position: true,
+        },
+      },
       order: {
         updatedAt: 'DESC',
       },
