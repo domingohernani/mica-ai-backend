@@ -6,6 +6,7 @@ import {
   PrimaryGeneratedColumn,
 } from 'typeorm';
 
+import { ApplicationStatus } from '../../interview/constants/application-status';
 import { Organization } from '../../organization/entities/organization.entity';
 import { Job } from './job.entity';
 
@@ -55,6 +56,13 @@ export class JobApplication {
 
   @Column()
   resumePath: string;
+
+  @Column({
+    type: 'enum',
+    enum: ApplicationStatus,
+    default: ApplicationStatus.NEW_APPLICATION,
+  })
+  status: ApplicationStatus;
 
   @Column({ type: 'timestamp' })
   appliedAt: Date;

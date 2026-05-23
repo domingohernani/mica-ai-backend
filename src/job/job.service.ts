@@ -5,6 +5,7 @@ import { Repository } from 'typeorm';
 import { ZodValidationPipe } from '../common/pipes/zod-validation.pipe';
 import { type GetParamDto } from '../common/schemas/get-param.schema';
 import { StorageService } from '../infrastructure/storage/storage.service';
+import { ApplicationStatus } from '../interview/constants/application-status';
 import now from '../utils/dates/now';
 import toTimestamp from '../utils/dates/toTimestamp';
 import { JobStatus } from './constants/job-status';
@@ -128,6 +129,7 @@ export class JobService {
       ...applicationBody.details,
       jobId: jobDto.id,
       organizationId: job.organizationId,
+      status: ApplicationStatus.NEW_APPLICATION,
       resumePath: path,
       appliedAt: now(),
       updatedAt: now(),
