@@ -2,6 +2,7 @@ import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 
 import { Interview } from '../../interview/entities/interview.entity';
 import { Job } from '../../job/entities/job.entity';
+import { JobApplication } from '../../job/entities/job-application.entity';
 import { Department } from '../department/entities/department.entity';
 import { Location } from '../location/entities/location.entity';
 import { Member } from '../member/entities/member.entity';
@@ -55,4 +56,13 @@ export class Organization {
     },
   )
   interviews: Interview[];
+
+  @OneToMany(
+    () => JobApplication,
+    (application: JobApplication) => application.organization,
+    {
+      cascade: true,
+    },
+  )
+  applications: JobApplication[];
 }

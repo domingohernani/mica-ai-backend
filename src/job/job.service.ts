@@ -106,6 +106,17 @@ export class JobService {
     applicationBody: ApplicationDto,
     file: Express.Multer.File,
   ): Promise<JobApplication> {
+    // Find which organization the job belows
+    const job: Job | null = await this.job.findOne({
+      where: {
+        id: jobDto.id,
+      },
+    });
+
+    if (!job || !job.organizationId) {
+      throw new NotFoundException(`No job found for ID ${jobDto.id}.`);
+    }
+
     const bucketName: string = 'mica-ai-resumes';
     const path: string = `${jobDto.id}/${file.originalname}`;
 
@@ -116,6 +127,7 @@ export class JobService {
     const newApplicationDto: JobApplication = {
       ...applicationBody.details,
       jobId: jobDto.id,
+      organizationId: job.organizationId,
       resumePath: path,
       appliedAt: now(),
       updatedAt: now(),

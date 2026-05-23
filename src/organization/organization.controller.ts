@@ -2,6 +2,7 @@ import { Body, Controller, Get, Param, Post, UsePipes } from '@nestjs/common';
 
 import { User } from '../common/decorators/user.decorator';
 import type { GetUserDto } from '../common/schemas/get-user.schema';
+import { GetAllApplicationDto } from '../job/schemas/get-all-applicatons.schema';
 import { ZodValidationPipe } from './../common/pipes/zod-validation.pipe';
 import type { GetParamDto } from './../common/schemas/get-param.schema';
 import { getParamSchema } from './../common/schemas/get-param.schema';
@@ -32,5 +33,14 @@ export class OrganizationController {
     @Param() organizationDto: GetParamDto,
   ): Promise<GetOrganizationDto[]> {
     return await this.organizationService.findByUserId(organizationDto);
+  }
+
+  // Get all applications of the organization
+  @Get(':id/applications')
+  @UsePipes(new ZodValidationPipe(getParamSchema))
+  async getAllApplications(
+    @Param() organizationDto: GetParamDto,
+  ): Promise<GetAllApplicationDto> {
+    return await this.organizationService.getAllApplications(organizationDto);
   }
 }

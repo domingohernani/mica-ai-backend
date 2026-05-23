@@ -6,6 +6,7 @@ import {
   PrimaryGeneratedColumn,
 } from 'typeorm';
 
+import { Organization } from '../../organization/entities/organization.entity';
 import { Job } from './job.entity';
 
 @Entity()
@@ -61,11 +62,22 @@ export class JobApplication {
   @Column({ type: 'timestamp' })
   updatedAt: Date;
 
-  // This represent the organizationId
+  // This represent the jobId
   @ManyToOne(() => Job, (job: Job) => job.applications)
   @JoinColumn({ name: 'jobId' })
   job?: Job;
 
   @Column('uuid')
   jobId: string;
+
+  // This represent the jobId
+  @ManyToOne(
+    () => Organization,
+    (organization: Organization) => organization.applications,
+  )
+  @JoinColumn({ name: 'organizationId' })
+  organization?: Job;
+
+  @Column('uuid')
+  organizationId: string;
 }

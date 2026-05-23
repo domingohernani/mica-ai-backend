@@ -4,6 +4,8 @@ import { Repository } from 'typeorm';
 
 import { GetParamDto } from '../common/schemas/get-param.schema';
 import { Roles } from '../constants/roles';
+import { JobApplication } from '../job/entities/job-application.entity';
+import { GetAllApplicationDto } from '../job/schemas/get-all-applicatons.schema';
 import { User } from '../user/entities/user.entity';
 import now from '../utils/dates/now';
 import { Organization } from './entities/organization.entity';
@@ -20,6 +22,8 @@ export class OrganizationService {
     private readonly organization: Repository<Organization>,
     @InjectRepository(User)
     private readonly user: Repository<User>,
+    @InjectRepository(JobApplication)
+    private readonly application: Repository<JobApplication>,
 
     private member: MemberService,
   ) {}
@@ -100,5 +104,20 @@ export class OrganizationService {
     );
 
     return convertedOrganizations;
+  }
+
+  async getAllApplications(
+    organizationDto: GetParamDto,
+  ): Promise<GetAllApplicationDto> {
+    // Find all application in the organization
+    const applications: JobApplication[] = await this.application.find({
+      where: {
+        organizationId: organizationDto.id,
+      },
+      order: {
+        updatedAt: 'DESC',
+      },
+    });
+    return applications;
   }
 }
