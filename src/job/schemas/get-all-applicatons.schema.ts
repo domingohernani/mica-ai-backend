@@ -16,22 +16,20 @@ export type ApplicantDetails = {
   professionalLinks: string | null;
 };
 
-export const getAllApplicationSchema: ZodType<ApplicantDetails[]> = z.array(
-  z.object({
-    firstName: z.string(),
-    lastName: z.string(),
-    middleName: z.string().nullable(),
-    dateOfBirth: z.date(),
-    email: z.email(),
-    phoneNumber: z.string(),
-    currentAddress: z.string(),
-    currentJobTitle: z.string().nullable(),
-    currentCompany: z.string().nullable(),
-    yearsOfExperience: z.number(),
-    expectedSalary: z.number(),
-    availability: z.string(),
-    professionalLinks: z.string().nullable(),
-  }),
-);
+export const getApplicationSchema: ZodType<ApplicantDetails> = z.object({
+  firstName: z.string(),
+  lastName: z.string(),
+  middleName: z.string().nullable(),
+  dateOfBirth: z.date(),
+  email: z.email(),
+  phoneNumber: z.string(),
+  currentAddress: z.string(),
+  currentJobTitle: z.string().nullable(),
+  currentCompany: z.string().nullable(),
+  yearsOfExperience: z.number(),
+  expectedSalary: z.number(),
+  availability: z.string(),
+  professionalLinks: z.string().nullable(),
+});
 
-export type GetAllApplicationDto = z.infer<typeof getAllApplicationSchema>;
+export type GetApplicationDto = z.infer<typeof getApplicationSchema>;

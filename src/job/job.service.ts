@@ -16,9 +16,10 @@ import {
   type CreateJobDto,
   createJobSchema,
 } from './schemas/create-job.schema';
-import { GetAllApplicationDto } from './schemas/get-all-applicatons.schema';
+import { GetApplicationDto } from './schemas/get-all-applicatons.schema';
 import { GetAllJobsDto } from './schemas/get-all-jobs.schema';
 import { type JobsDto } from './schemas/job.schema';
+import { JobApplicationParamsDto } from './schemas/job-application.params.schema';
 import { type UpdateJobDto } from './schemas/update-job.schema';
 
 @Injectable()
@@ -145,17 +146,40 @@ export class JobService {
   }
 
   async findAllApplications(
-    jobDto: GetParamDto,
-  ): Promise<GetAllApplicationDto> {
+    applicationDto: GetParamDto,
+  ): Promise<GetApplicationDto[]> {
     // Find all applications using organizationId
     const applications: JobApplication[] = await this.application.find({
       where: {
-        jobId: jobDto.id,
+        jobId: applicationDto.id,
       },
       order: {
         updatedAt: 'DESC',
       },
     });
     return applications;
+  }
+
+  async findApplicant(
+    applicationDto: JobApplicationParamsDto,
+  ): Promise<GetApplicationDto> {
+    // Find applicant using organizationId
+    const application: JobApplication | null = await this.application.findOne({
+      where: {
+        id: applicationDto.applicationId,
+        jobId: applicationDto.id,
+      },
+      order: {
+        updatedAt: 'DESC',
+      },
+    });
+
+    if (!application) {
+      throw new NotFoundException(
+        `No application found for ID ${applicationDto.id}.`,
+      );
+    }
+
+    return application;
   }
 }

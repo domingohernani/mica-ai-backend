@@ -28,9 +28,13 @@ import {
   type CreateJobDto,
   createJobSchema,
 } from './schemas/create-job.schema';
-import { GetAllApplicationDto } from './schemas/get-all-applicatons.schema';
+import { GetApplicationDto } from './schemas/get-all-applicatons.schema';
 import { GetAllJobsDto } from './schemas/get-all-jobs.schema';
 import { type JobsDto } from './schemas/job.schema';
+import {
+  jobApplicationParamSchema,
+  type JobApplicationParamsDto,
+} from './schemas/job-application.params.schema';
 import {
   type UpdateJobDto,
   updateJobSchema,
@@ -91,8 +95,16 @@ export class JobController {
   @Get(':id/applications')
   @UsePipes(new ZodValidationPipe(getParamSchema))
   async findAllApplications(
-    @Param() jobDto: GetParamDto,
-  ): Promise<GetAllApplicationDto> {
-    return this.jobService.findAllApplications(jobDto);
+    @Param() applicationDto: GetParamDto,
+  ): Promise<GetApplicationDto[]> {
+    return this.jobService.findAllApplications(applicationDto);
+  }
+
+  @Get(':id/applications/:applicationId')
+  async findApplication(
+    @Param(new ZodValidationPipe(jobApplicationParamSchema))
+    applicationDto: JobApplicationParamsDto,
+  ): Promise<GetApplicationDto> {
+    return this.jobService.findApplicant(applicationDto);
   }
 }

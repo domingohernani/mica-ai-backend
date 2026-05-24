@@ -5,7 +5,7 @@ import { Repository } from 'typeorm';
 import { GetParamDto } from '../common/schemas/get-param.schema';
 import { Roles } from '../constants/roles';
 import { JobApplication } from '../job/entities/job-application.entity';
-import { GetAllApplicationDto } from '../job/schemas/get-all-applicatons.schema';
+import { GetApplicationDto } from '../job/schemas/get-all-applicatons.schema';
 import { User } from '../user/entities/user.entity';
 import now from '../utils/dates/now';
 import { Organization } from './entities/organization.entity';
@@ -108,7 +108,7 @@ export class OrganizationService {
 
   async getAllApplications(
     organizationDto: GetParamDto,
-  ): Promise<GetAllApplicationDto> {
+  ): Promise<GetApplicationDto[]> {
     // Find all application in the organization
     const applications: JobApplication[] = await this.application.find({
       where: {
