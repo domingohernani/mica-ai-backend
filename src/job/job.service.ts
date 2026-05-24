@@ -147,7 +147,7 @@ export class JobService {
   async findAllApplications(
     jobDto: GetParamDto,
   ): Promise<GetAllApplicationDto> {
-    // Find all departments using organizationId
+    // Find all applications using organizationId
     const applications: JobApplication[] = await this.application.find({
       where: {
         jobId: jobDto.id,
