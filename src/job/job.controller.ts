@@ -83,8 +83,6 @@ export class JobController {
     @Body(new ZodValidationPipe(createApplicationSchema))
     applicationBody: ApplicationDto,
   ): Promise<JobApplication> {
-    console.log(applicationBody);
-
     return await this.jobService.createApplication(
       jobId,
       applicationBody,
