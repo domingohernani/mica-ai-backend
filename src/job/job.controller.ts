@@ -17,9 +17,14 @@ import {
   type GetParamDto,
   getParamSchema,
 } from '../common/schemas/get-param.schema';
+import { ApplicantEvaluation } from './entities/applicant-evaluation.entity';
 import { Job } from './entities/job.entity';
 import { JobApplication } from './entities/job-application.entity';
 import { JobService } from './job.service';
+import {
+  type ApplicantEvaluationDto,
+  applicantEvaluationSchema,
+} from './schemas/applicant-evaluation.shema';
 import {
   type ApplicationDto,
   createApplicationSchema,
@@ -104,5 +109,16 @@ export class JobController {
     applicationDto: JobApplicationParamsDto,
   ): Promise<GetApplicationDto> {
     return this.jobService.findApplicant(applicationDto);
+  }
+
+  @Public()
+  @Post(':id/applications/:applicationId/evaluation')
+  async evaluate(
+    @Param(new ZodValidationPipe(jobApplicationParamSchema))
+    applicationDto: JobApplicationParamsDto,
+    @Body(new ZodValidationPipe(applicantEvaluationSchema))
+    evaluationBody: ApplicantEvaluationDto,
+  ): Promise<ApplicantEvaluation> {
+    return this.jobService.evaluate(applicationDto, evaluationBody);
   }
 }

@@ -9,8 +9,10 @@ import { ApplicationStatus } from '../interview/constants/application-status';
 import now from '../utils/dates/now';
 import toTimestamp from '../utils/dates/toTimestamp';
 import { JobStatus } from './constants/job-status';
+import { ApplicantEvaluation } from './entities/applicant-evaluation.entity';
 import { Job } from './entities/job.entity';
 import { JobApplication } from './entities/job-application.entity';
+import { type ApplicantEvaluationDto } from './schemas/applicant-evaluation.shema';
 import { ApplicationDto } from './schemas/create-application.schema';
 import {
   type CreateJobDto,
@@ -30,6 +32,8 @@ export class JobService {
     private readonly job: Repository<Job>,
     @InjectRepository(JobApplication)
     private readonly application: Repository<JobApplication>,
+    @InjectRepository(ApplicantEvaluation)
+    private readonly evaluation: Repository<ApplicantEvaluation>,
     private storage: StorageService,
   ) {}
 
@@ -181,5 +185,33 @@ export class JobService {
     }
 
     return application;
+  }
+
+  async evaluate(
+    applicationDto: JobApplicationParamsDto,
+    evaluationBody: ApplicantEvaluationDto,
+  ): Promise<ApplicantEvaluation> {
+    const application: JobApplication | null = await this.application.findOne({
+      where: {
+        id: applicationDto.applicationId,
+        jobId: applicationDto.id,
+      },
+    });
+
+    if (!application) {
+      throw new NotFoundException(
+        `No job found for ID ${applicationDto.id} under application ID ${applicationDto.applicationId}`,
+      );
+    }
+    // Create DTO and save
+    const applicationEvaluationDto: ApplicantEvaluation = {
+      evaluation: evaluationBody,
+      jobApplicationId: applicationDto.applicationId,
+    };
+    const applicationEvaluation: ApplicantEvaluation = this.evaluation.create(
+      applicationEvaluationDto,
+    );
+    await this.evaluation.save(applicationEvaluation);
+    return applicationEvaluation;
   }
 }

@@ -3,11 +3,13 @@ import {
   Entity,
   JoinColumn,
   ManyToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 
 import { ApplicationStatus } from '../../interview/constants/application-status';
 import { Organization } from '../../organization/entities/organization.entity';
+import { ApplicantEvaluation } from './applicant-evaluation.entity';
 import { Job } from './job.entity';
 
 @Entity()
@@ -88,4 +90,14 @@ export class JobApplication {
 
   @Column('uuid')
   organizationId: string;
+
+  @OneToMany(
+    () => ApplicantEvaluation,
+    (applicantEvaluation: ApplicantEvaluation) =>
+      applicantEvaluation.jobApplication,
+    {
+      cascade: true,
+    },
+  )
+  applicantEvaluation?: ApplicantEvaluation[];
 }
