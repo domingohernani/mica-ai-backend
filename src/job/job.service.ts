@@ -1,6 +1,7 @@
 import { Body, Injectable, NotFoundException, Param } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { v4 as uuidv4 } from 'uuid';
 
 import { ZodValidationPipe } from '../common/pipes/zod-validation.pipe';
 import { type GetParamDto } from '../common/schemas/get-param.schema';
@@ -123,14 +124,18 @@ export class JobService {
       throw new NotFoundException(`No job found for ID ${jobDto.id}.`);
     }
 
+    const applicationId: string = uuidv4();
     const bucketName: string = 'mica-ai-resumes';
-    const path: string = `${jobDto.id}/${file.originalname}`;
-
+    const fileExtension: string = file.originalname.split('.').pop() || '';
+    const path: string = fileExtension
+      ? `${jobDto.id}/${applicationId}.${fileExtension}`
+      : `${jobDto.id}/${applicationId}`;
     // Upload resume
     await this.storage.upload(file.buffer, path, bucketName);
 
     // Creating new application DTO and modifying types
     const newApplicationDto: JobApplication = {
+      id: applicationId,
       ...applicationBody.details,
       jobId: jobDto.id,
       organizationId: job.organizationId,
