@@ -114,10 +114,13 @@ export class OrganizationService {
       where: {
         organizationId: organizationDto.id,
       },
-      relations: ['job'],
+      relations: ['applicantEvaluation', 'job'],
       select: {
         job: {
           position: true,
+        },
+        applicantEvaluation: {
+          evaluation: true,
         },
       },
       order: {

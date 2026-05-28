@@ -3,7 +3,7 @@ import {
   Entity,
   JoinColumn,
   ManyToOne,
-  OneToMany,
+  OneToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 
@@ -91,7 +91,7 @@ export class JobApplication {
   @Column('uuid')
   organizationId: string;
 
-  @OneToMany(
+  @OneToOne(
     () => ApplicantEvaluation,
     (applicantEvaluation: ApplicantEvaluation) =>
       applicantEvaluation.jobApplication,
@@ -99,5 +99,5 @@ export class JobApplication {
       cascade: true,
     },
   )
-  applicantEvaluation?: ApplicantEvaluation[];
+  applicantEvaluation?: ApplicantEvaluation;
 }

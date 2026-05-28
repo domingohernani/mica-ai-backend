@@ -2,7 +2,7 @@ import {
   Column,
   Entity,
   JoinColumn,
-  ManyToOne,
+  OneToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 
@@ -23,7 +23,7 @@ export class ApplicantEvaluation {
   @Column('jsonb')
   evaluation: Evaluation;
 
-  @ManyToOne(
+  @OneToOne(
     () => JobApplication,
     (jobApplication: JobApplication) => jobApplication.applicantEvaluation,
   )
