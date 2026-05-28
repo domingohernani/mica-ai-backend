@@ -67,14 +67,14 @@ export class JobService {
     organizationDto: GetParamDto,
   ): Promise<GetAllJobsDto> {
     // Find all departments using organizationId
-    const jobs: Job[] | null = await this.job.find({
-      where: {
-        organizationId: organizationDto.id,
-      },
-      order: {
-        updatedAt: 'DESC',
-      },
-    });
+    const jobs: Job[] | null = await this.job
+      .createQueryBuilder('job')
+      .where('job.organizationId = :id', {
+        id: organizationDto.id,
+      })
+      .loadRelationCountAndMap('job.applicationCount', 'job.applications')
+      .orderBy('job.updatedAt', 'DESC')
+      .getMany();
 
     return jobs;
   }
@@ -178,8 +178,14 @@ export class JobService {
         id: applicationDto.applicationId,
         jobId: applicationDto.id,
       },
+      relations: ['applicantEvaluation'],
       order: {
         updatedAt: 'DESC',
+      },
+      select: {
+        applicantEvaluation: {
+          evaluation: true,
+        },
       },
     });
 
