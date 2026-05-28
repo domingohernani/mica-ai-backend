@@ -2,7 +2,7 @@ import z from 'zod';
 import { ZodType } from 'zod';
 
 import now from '../../utils/dates/now';
-import { Status } from '../constants/status';
+import { JobStatus } from '../constants/job-status';
 
 // Specifying the types
 type UpdateJobType = {
@@ -17,7 +17,7 @@ export const updateJobSchema: ZodType<UpdateJobType> = z
   .object({
     position: z.string().min(1, 'Position is required').max(100).optional(),
     description: z.string().optional(),
-    status: z.enum(Status).optional(),
+    status: z.enum(JobStatus).optional(),
     createdAt: z.date().default(now()).optional(),
     updatedAt: z.date().default(now()).optional(),
   })

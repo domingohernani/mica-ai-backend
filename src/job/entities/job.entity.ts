@@ -3,10 +3,12 @@ import {
   Entity,
   JoinColumn,
   ManyToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 
 import { Organization } from '../../organization/entities/organization.entity';
+import { JobApplication } from './job-application.entity';
 
 @Entity()
 export class Job {
@@ -57,8 +59,8 @@ export class Job {
   @Column({ default: 1 })
   openPositions: number;
 
-  @Column({ type: 'date', nullable: true })
-  applicationDeadline?: string;
+  @Column({ type: 'timestamp', nullable: true })
+  applicationDeadline?: Date;
 
   @Column({ type: 'simple-array', nullable: true })
   skills?: string[];
@@ -80,4 +82,14 @@ export class Job {
 
   @Column('uuid')
   organizationId: string;
+
+  // This respresents job application
+  @OneToMany(
+    () => JobApplication,
+    (applications: JobApplication) => applications.job,
+    {
+      cascade: true,
+    },
+  )
+  applications?: JobApplication[];
 }

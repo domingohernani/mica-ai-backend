@@ -1,6 +1,6 @@
 import z, { ZodType } from 'zod';
 
-import { Status } from '../constants/status';
+import { JobStatus } from '../constants/job-status';
 
 export const getAllJobsSchema: ZodType<
   {
@@ -18,7 +18,7 @@ export const getAllJobsSchema: ZodType<
     salaryMax?: number;
     benefits?: string;
     openPositions: number;
-    applicationDeadline?: string;
+    applicationDeadline?: Date;
     skills?: string[];
   }[]
 > = z.array(
@@ -35,14 +35,14 @@ export const getAllJobsSchema: ZodType<
     description: z.string(),
     requirements: z.string(),
     assignedRecruiter: z.string(),
-    status: z.enum(Status),
+    status: z.enum(JobStatus),
 
     // Optional fields
     salaryMin: z.number().min(0).optional(),
     salaryMax: z.number().min(0).optional(),
     benefits: z.string().optional(),
     openPositions: z.number().min(1).default(1),
-    applicationDeadline: z.string().optional(),
+    applicationDeadline: z.date().optional(),
     skills: z.array(z.string()).optional(),
   }),
 );

@@ -4,6 +4,8 @@ import { Repository } from 'typeorm';
 
 import { GetParamDto } from '../common/schemas/get-param.schema';
 import { Roles } from '../constants/roles';
+import { JobApplication } from '../job/entities/job-application.entity';
+import { GetApplicationDto } from '../job/schemas/get-all-applicatons.schema';
 import { User } from '../user/entities/user.entity';
 import now from '../utils/dates/now';
 import { Organization } from './entities/organization.entity';
@@ -20,9 +22,26 @@ export class OrganizationService {
     private readonly organization: Repository<Organization>,
     @InjectRepository(User)
     private readonly user: Repository<User>,
+    @InjectRepository(JobApplication)
+    private readonly application: Repository<JobApplication>,
 
     private member: MemberService,
   ) {}
+
+  // Find organization
+  async find(organizationDto: GetParamDto): Promise<GetOrganizationDto> {
+    const organization: Organization | null = await this.organization.findOne({
+      where: { id: organizationDto.id },
+    });
+
+    if (!organization || !organization.id) {
+      throw new NotFoundException(
+        `No organization found for ID ${organizationDto.id}.`,
+      );
+    }
+
+    return { id: organizationDto.id, ...organization };
+  }
 
   // Create organization and create a member
   async create(
@@ -85,5 +104,29 @@ export class OrganizationService {
     );
 
     return convertedOrganizations;
+  }
+
+  async getAllApplications(
+    organizationDto: GetParamDto,
+  ): Promise<GetApplicationDto[]> {
+    // Find all application in the organization
+    const applications: JobApplication[] = await this.application.find({
+      where: {
+        organizationId: organizationDto.id,
+      },
+      relations: ['applicantEvaluation', 'job'],
+      select: {
+        job: {
+          position: true,
+        },
+        applicantEvaluation: {
+          evaluation: true,
+        },
+      },
+      order: {
+        updatedAt: 'DESC',
+      },
+    });
+    return applications;
   }
 }

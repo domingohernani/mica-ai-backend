@@ -4,6 +4,7 @@ import { Repository } from 'typeorm';
 
 import { GetParamDto } from '../common/schemas/get-param.schema';
 import { StorageService } from '../infrastructure/storage/storage.service';
+import { OrganizationService } from '../organization/organization.service';
 import { Interview } from './entities/interview.entity';
 import { InterviewDto } from './interview.dto';
 import { QuestionDto } from './question/question.dto';
@@ -14,6 +15,7 @@ export class InterviewService {
   constructor(
     @InjectRepository(Interview) private interview: Repository<Interview>,
     private storage: StorageService,
+    private organization: OrganizationService,
   ) {}
 
   // Find the right interview using interview ID
@@ -43,14 +45,50 @@ export class InterviewService {
     return convertedInterview;
   }
 
+  async findByOrganizationId(
+    organizationDto: GetParamDto,
+    interviewDto: GetParamDto,
+  ): Promise<InterviewDto> {
+    const interview: Interview | null = await this.interview.findOne({
+      where: { organizationId: organizationDto.id, id: interviewDto.id },
+      relations: ['conversations'],
+    });
+
+    // Checking if the interview is found. Throws an erorr if not found
+    if (!interview) {
+      throw new NotFoundException(
+        `Interview with ID ${interviewDto.id} not found under organization ID ${organizationDto.id}`,
+      );
+    }
+
+    return interview;
+  }
+
+  async findAllByOrganizationId(
+    organizationDto: GetParamDto,
+  ): Promise<InterviewDto[]> {
+    const interviews: Interview[] = await this.interview.find({
+      where: { organizationId: organizationDto.id },
+    });
+    return interviews;
+  }
+
   // Create an interview document
-  async create(interviewDto: InterviewDto): Promise<Interview> {
+  async create(
+    // TODO: change the GetParamDto to ParamDto, since it is being use on diff methods.
+    // This is exist on other services as well.
+    param: GetParamDto,
+    interviewDto: InterviewDto,
+  ): Promise<InterviewDto> {
     // Creating ordered question
     const orderedConversation: QuestionDto[] = interviewDto.conversations.map(
       (convo: QuestionDto, index: number) => ({ ...convo, order: index }),
     );
 
+    await this.organization.find(param);
+
     interviewDto.conversations = orderedConversation;
+    interviewDto.organizationId = param.id;
 
     const newInterview: Interview = this.interview.create(interviewDto);
     // Saves into the database

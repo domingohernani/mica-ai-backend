@@ -5,8 +5,11 @@ import {
   Param,
   Patch,
   Post,
+  UploadedFile,
+  UseInterceptors,
   UsePipes,
 } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
 
 import { Public } from '../common/decorators/public.decorator';
 import { ZodValidationPipe } from '../common/pipes/zod-validation.pipe';
@@ -14,13 +17,29 @@ import {
   type GetParamDto,
   getParamSchema,
 } from '../common/schemas/get-param.schema';
+import { ApplicantEvaluation } from './entities/applicant-evaluation.entity';
 import { Job } from './entities/job.entity';
+import { JobApplication } from './entities/job-application.entity';
 import { JobService } from './job.service';
+import {
+  type ApplicantEvaluationDto,
+  applicantEvaluationSchema,
+} from './schemas/applicant-evaluation.shema';
+import {
+  type ApplicationDto,
+  createApplicationSchema,
+} from './schemas/create-application.schema';
 import {
   type CreateJobDto,
   createJobSchema,
 } from './schemas/create-job.schema';
+import { GetApplicationDto } from './schemas/get-all-applicatons.schema';
 import { GetAllJobsDto } from './schemas/get-all-jobs.schema';
+import { type JobsDto } from './schemas/job.schema';
+import {
+  jobApplicationParamSchema,
+  type JobApplicationParamsDto,
+} from './schemas/job-application.params.schema';
 import {
   type UpdateJobDto,
   updateJobSchema,
@@ -33,8 +52,16 @@ export class JobController {
   @Public()
   @Get(':id')
   @UsePipes(new ZodValidationPipe(getParamSchema))
-  async findAll(@Param() organizationDto: GetParamDto): Promise<GetAllJobsDto> {
-    return await this.jobService.findAll(organizationDto);
+  async find(@Param() interviewDto: GetParamDto): Promise<JobsDto> {
+    return await this.jobService.find(interviewDto);
+  }
+
+  @Get('/organization/:id')
+  @UsePipes(new ZodValidationPipe(getParamSchema))
+  async findAllByOrganizationId(
+    @Param() organizationDto: GetParamDto,
+  ): Promise<GetAllJobsDto> {
+    return await this.jobService.findAllByOrganizationId(organizationDto);
   }
 
   @Post()
@@ -43,11 +70,55 @@ export class JobController {
     return await this.jobService.create(jobDto);
   }
 
+  // TODO: implement
   @Patch(':id')
   update(
     @Param(new ZodValidationPipe(getParamSchema)) jobId: GetParamDto,
     @Body(new ZodValidationPipe(updateJobSchema)) jobBody: UpdateJobDto,
   ): void {
     this.jobService.update(jobId, jobBody);
+  }
+
+  // Applications
+  @Post(':id/applications')
+  @UseInterceptors(FileInterceptor('resume'))
+  async createApplication(
+    @Param(new ZodValidationPipe(getParamSchema)) jobId: GetParamDto,
+    @UploadedFile() file: Express.Multer.File,
+    @Body(new ZodValidationPipe(createApplicationSchema))
+    applicationBody: ApplicationDto,
+  ): Promise<JobApplication> {
+    return await this.jobService.createApplication(
+      jobId,
+      applicationBody,
+      file,
+    );
+  }
+
+  @Get(':id/applications')
+  @UsePipes(new ZodValidationPipe(getParamSchema))
+  async findAllApplications(
+    @Param() applicationDto: GetParamDto,
+  ): Promise<GetApplicationDto[]> {
+    return this.jobService.findAllApplications(applicationDto);
+  }
+
+  @Get(':id/applications/:applicationId')
+  async findApplication(
+    @Param(new ZodValidationPipe(jobApplicationParamSchema))
+    applicationDto: JobApplicationParamsDto,
+  ): Promise<GetApplicationDto> {
+    return this.jobService.findApplicant(applicationDto);
+  }
+
+  @Public()
+  @Post(':id/applications/:applicationId/evaluation')
+  async evaluate(
+    @Param(new ZodValidationPipe(jobApplicationParamSchema))
+    applicationDto: JobApplicationParamsDto,
+    @Body(new ZodValidationPipe(applicantEvaluationSchema))
+    evaluationBody: ApplicantEvaluationDto,
+  ): Promise<ApplicantEvaluation> {
+    return this.jobService.evaluate(applicationDto, evaluationBody);
   }
 }

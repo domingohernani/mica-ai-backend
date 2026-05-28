@@ -44,11 +44,16 @@ export class UserService {
 
     if (!user || !user.id) return null;
 
+    /* eslint-disable @typescript-eslint/typedef */
+    /* eslint-disable @typescript-eslint/no-unused-vars */
+    const { members, ...userFields } = user;
+
     // Create a user dto
     const userDto: GetUserDto = {
-      ...user,
+      ...userFields,
       id: user.id.toString(),
     };
+
     return userDto;
   }
 }
