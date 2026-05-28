@@ -208,6 +208,18 @@ export class JobService {
         `No job found for ID ${applicationDto.id} under application ID ${applicationDto.applicationId}`,
       );
     }
+
+    // Check if the evaluation is already done
+    const existing: ApplicantEvaluation | null = await this.evaluation.findOne({
+      where: { jobApplicationId: applicationDto.applicationId },
+    });
+    if (existing) {
+      console.log(
+        `Evaluation already exists for ${applicationDto.applicationId}, skipping.`,
+      );
+      return existing;
+    }
+
     // Create DTO and save
     const applicationEvaluationDto: ApplicantEvaluation = {
       evaluation: evaluationBody,
