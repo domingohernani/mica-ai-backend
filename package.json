@@ -9,7 +9,7 @@
     "build": "nest build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "start": "nest start",
-    "start:dev": "npx concurrently -n \"PROXY,NEST\" -c \"blue,green\" \"cloud-sql-proxy mica-ai-v1:asia-east1:mica-ai-db --port 5432\" \"nest start --watch --env-file .env\"",
+    "start:dev": "npx concurrently -n \"PROXY,NEST\" -c \"blue,green\" \"cloud-sql-proxy mica-ai-v1:asia-east1:mica-ai-db --port 5433\" \"nest start --watch --env-file .env\"",
     "start:debug": "nest start --debug --watch",
     "start:prod": "bun dist/main.js",
     "gcp-build": "npm run build",
