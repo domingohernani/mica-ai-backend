@@ -36,7 +36,7 @@ export class StorageService {
 
   // Generate signed url
   // eg: folder/file.mp3
-  async sign(filePath: string): Promise<string> {
+  async sign(filePath: string, bucketName?: string): Promise<string> {
     // These options will allow temporary read access to the file
     const options: GetSignedUrlConfig = {
       version: 'v4',
@@ -46,7 +46,7 @@ export class StorageService {
 
     // Get a v4 signed URL for reading the file
     const signedUrl: Promise<GetSignedUrlResponse> = this.client
-      .bucket(this.bucket)
+      .bucket(bucketName ?? this.bucket)
       .file(filePath)
       .getSignedUrl(options);
 

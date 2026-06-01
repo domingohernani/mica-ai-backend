@@ -7,6 +7,7 @@ export type ApplicantDetails = {
   dateOfBirth: Date;
   email: string;
   phoneNumber: string;
+  resumeUrl?: string;
   currentAddress: string;
   currentJobTitle: string | null;
   currentCompany: string | null;
@@ -23,6 +24,7 @@ export const getApplicationSchema: ZodType<ApplicantDetails> = z.object({
   dateOfBirth: z.date(),
   email: z.email(),
   phoneNumber: z.string(),
+  resumeUrl: z.url().optional(),
   currentAddress: z.string(),
   currentJobTitle: z.string().nullable(),
   currentCompany: z.string().nullable(),

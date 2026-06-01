@@ -195,7 +195,19 @@ export class JobService {
       );
     }
 
-    return application;
+    // Provide a signed url for the resume
+    const bucketName: string = 'mica-ai-resumes';
+    const resumeUrl: string = await this.storage.sign(
+      application.resumePath,
+      bucketName,
+    );
+
+    const jobApplicationDto: GetApplicationDto = {
+      ...application,
+      resumeUrl,
+    };
+
+    return jobApplicationDto;
   }
 
   async evaluate(
