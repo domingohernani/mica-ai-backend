@@ -27,6 +27,7 @@ import { MemberModule } from './organization/member/member.module';
 import { OrganizationModule } from './organization/organization.module';
 import { User } from './user/entities/user.entity';
 import { UserModule } from './user/user.module';
+import { EmailService } from './infrastructure/email/email.service';
 
 @Module({
   imports: [
@@ -81,6 +82,7 @@ import { UserModule } from './user/user.module';
       provide: APP_GUARD,
       useClass: UserGuard,
     },
+    EmailService,
   ],
 })
 export class AppModule {}

@@ -111,6 +111,17 @@ export class JobController {
     return this.jobService.findApplicant(applicationDto);
   }
 
+  // Schedule an applicant's interview
+  @Post(':id/applications/:applicationId/schedule-interview')
+  async createSchedule(
+    @Param(new ZodValidationPipe(jobApplicationParamSchema))
+    scheduleDto: JobApplicationParamsDto,
+    @Body()
+    evaluationBody: ApplicantEvaluationDto,
+  ): Promise<void> {
+    console.log(evaluationBody);
+  }
+
   @Public()
   @Post(':id/applications/:applicationId/evaluation')
   async evaluate(
